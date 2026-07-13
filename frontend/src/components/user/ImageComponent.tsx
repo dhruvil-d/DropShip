@@ -45,6 +45,27 @@ const ImageSettings = () => {
           <input type="text" value={props.src} onChange={(e) => setProp((p: ImageComponentProps) => { p.src = e.target.value; })}
             className="w-full mt-1 px-2 py-1 border border-gray-200 rounded text-sm" />
         </label>
+
+        <div className="mt-2">
+          <span className="text-xs text-gray-600">Or upload an image</span>
+          <input
+            type="file"
+            accept="image/*"
+            className="w-full mt-1 text-xs file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                  const dataUrl = event.target?.result as string;
+                  setProp((p: ImageComponentProps) => { p.src = dataUrl; });
+                };
+                reader.readAsDataURL(file);
+              }
+            }}
+          />
+        </div>
+
         <label className="text-xs text-gray-600 mt-2 block">
           Alt Text
           <input type="text" value={props.alt} onChange={(e) => setProp((p: ImageComponentProps) => { p.alt = e.target.value; })}

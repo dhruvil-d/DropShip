@@ -6,7 +6,7 @@ const registry = require('./component-registry');
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' })); // Increased limit for Base64 images
 
 // ============================================================
 // Dynamic JSX Compiler — Registry-Driven
@@ -43,16 +43,24 @@ function buildStyleAttribute(styleEntries) {
 
 /**
  * Build form field children (label + input/textarea/select) for form components.
+ * Reads label/field classes from the registry definition — no hardcoded strings.
  */
 function buildFormFieldChildren(def, nodeProps) {
   const children = [];
   const fieldTag = def.formFieldTag; // 'input', 'textarea', or 'select'
+  const labelClasses = def.formLabelClasses || 'text-sm font-medium text-gray-700';
+  const fieldClasses = def.formFieldClasses || 'w-full px-3 py-2 border border-gray-300 rounded-md text-sm';
+
+  const fieldName = nodeProps.label 
+    ? nodeProps.label.toLowerCase().replace(/[^a-z0-9]/g, '-') 
+    : 'field';
 
   // Label
   if (nodeProps.label) {
     const labelEl = t.jsxElement(
       t.jsxOpeningElement(t.jsxIdentifier('label'), [
-        t.jsxAttribute(t.jsxIdentifier('className'), t.stringLiteral('text-sm font-medium text-gray-700')),
+        t.jsxAttribute(t.jsxIdentifier('htmlFor'), t.stringLiteral(fieldName)),
+        t.jsxAttribute(t.jsxIdentifier('className'), t.stringLiteral(labelClasses)),
       ], false),
       t.jsxClosingElement(t.jsxIdentifier('label')),
       [t.jsxText(nodeProps.label)],
@@ -63,8 +71,9 @@ function buildFormFieldChildren(def, nodeProps) {
 
   // Build field attributes
   const fieldAttrs = [
-    t.jsxAttribute(t.jsxIdentifier('className'),
-      t.stringLiteral('w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500')),
+    t.jsxAttribute(t.jsxIdentifier('id'), t.stringLiteral(fieldName)),
+    t.jsxAttribute(t.jsxIdentifier('name'), t.stringLiteral(fieldName)),
+    t.jsxAttribute(t.jsxIdentifier('className'), t.stringLiteral(fieldClasses)),
   ];
 
   if (nodeProps.placeholder) {
@@ -81,7 +90,6 @@ function buildFormFieldChildren(def, nodeProps) {
   }
 
   if (fieldTag === 'select') {
-    // Build <select> with <option> children
     const optionStrings = (nodeProps.options || '').split(',').map(s => s.trim()).filter(Boolean);
     const optionElements = optionStrings.map(opt => {
       return t.jsxElement(
@@ -102,7 +110,6 @@ function buildFormFieldChildren(def, nodeProps) {
     );
     children.push(selectEl);
   } else if (fieldTag === 'input') {
-    // Self-closing <input />
     const inputEl = t.jsxElement(
       t.jsxOpeningElement(t.jsxIdentifier('input'), fieldAttrs, true),
       null,
@@ -111,7 +118,6 @@ function buildFormFieldChildren(def, nodeProps) {
     );
     children.push(inputEl);
   } else {
-    // <textarea>...</textarea>
     const textareaEl = t.jsxElement(
       t.jsxOpeningElement(t.jsxIdentifier(fieldTag), fieldAttrs, false),
       t.jsxClosingElement(t.jsxIdentifier(fieldTag)),
@@ -122,6 +128,75 @@ function buildFormFieldChildren(def, nodeProps) {
   }
 
   return children;
+}
+
+/**
+ * Build Alert children (title + message) for AlertComponent.
+ */
+function buildAlertChildren(nodeProps) {
+  const children = [];
+
+  if (nodeProps.title) {
+    const titleEl = t.jsxElement(
+      t.jsxOpeningElement(t.jsxIdentifier('strong'), [
+        t.jsxAttribute(t.jsxIdentifier('className'), t.stringLiteral('block font-semibold mb-1')),
+      ], false),
+      t.jsxClosingElement(t.jsxIdentifier('strong')),
+      [t.jsxText(nodeProps.title)],
+      false
+    );
+    children.push(titleEl);
+  }
+
+  if (nodeProps.message) {
+    const msgEl = t.jsxElement(
+      t.jsxOpeningElement(t.jsxIdentifier('span'), [
+        t.jsxAttribute(t.jsxIdentifier('className'), t.stringLiteral('text-sm')),
+      ], false),
+      t.jsxClosingElement(t.jsxIdentifier('span')),
+      [t.jsxText(nodeProps.message)],
+      false
+    );
+    children.push(msgEl);
+  }
+
+  return children;
+}
+
+/**
+ * Build Avatar children — either an <img> or a fallback <span>.
+ */
+function buildAvatarChildren(nodeProps) {
+  if (nodeProps.src) {
+    const imgEl = t.jsxElement(
+      t.jsxOpeningElement(t.jsxIdentifier('img'), [
+        t.jsxAttribute(t.jsxIdentifier('src'), t.stringLiteral(nodeProps.src)),
+        t.jsxAttribute(t.jsxIdentifier('alt'), t.stringLiteral(nodeProps.alt || '')),
+        t.jsxAttribute(t.jsxIdentifier('className'), t.stringLiteral('w-full h-full object-cover')),
+      ], true),
+      null, [], true
+    );
+    return [imgEl];
+  }
+
+  // Fallback: show initials
+  const fallback = nodeProps.fallbackText || '?';
+  return [t.jsxText(fallback)];
+}
+
+/**
+ * Build List children — <li> elements from comma-separated items string.
+ */
+function buildListChildren(nodeProps) {
+  const items = (nodeProps.items || '').split(',').map(s => s.trim()).filter(Boolean);
+  return items.map(item => {
+    return t.jsxElement(
+      t.jsxOpeningElement(t.jsxIdentifier('li'), [], false),
+      t.jsxClosingElement(t.jsxIdentifier('li')),
+      [t.jsxText(item)],
+      false
+    );
+  });
 }
 
 /**
@@ -138,6 +213,11 @@ function generateJSX(nodes, nodeId) {
   let tagName = def.tagName;
   if (def.dynamicTag && node.props && node.props[def.dynamicTag]) {
     tagName = node.props[def.dynamicTag];
+  }
+
+  // For ListComponent: use <ol> if ordered=true
+  if (def.isList && node.props && node.props.ordered) {
+    tagName = 'ol';
   }
 
   const children = [];
@@ -182,15 +262,15 @@ function generateJSX(nodes, nodeId) {
     }
 
     if (behavior.type === 'className') {
-      // Will be merged into the main className below
       continue;
     }
   }
 
-  // ---------- Build className from baseClasses + variantClasses ----------
+  // ---------- Build className from baseClasses + variantClasses + booleanClasses ----------
 
   let classNames = (def.baseClasses || '').trim();
 
+  // Variant classes (select-based props like variant, size, shadow)
   if (def.variantClasses && node.props) {
     for (const [propName, variants] of Object.entries(def.variantClasses)) {
       const propValue = node.props[propName];
@@ -200,15 +280,18 @@ function generateJSX(nodes, nodeId) {
     }
   }
 
-  // Handle fullWidth for Button
-  if (typeName === 'Button' && node.props && node.props.fullWidth) {
-    classNames += ' w-full';
+  // Boolean classes (boolean props that add a class when true)
+  if (def.booleanClasses && node.props) {
+    for (const [propName, className] of Object.entries(def.booleanClasses)) {
+      if (node.props[propName]) {
+        classNames += ' ' + className;
+      }
+    }
   }
 
-  // Handle shadow for Container/Card (Tailwind shadow classes)
-  if (node.props && node.props.shadow && node.props.shadow !== 'none') {
-    const shadowMap = { sm: 'shadow-sm', md: 'shadow-md', lg: 'shadow-lg', xl: 'shadow-xl' };
-    classNames += ' ' + (shadowMap[node.props.shadow] || '');
+  // For ListComponent: swap list-disc for list-decimal if ordered
+  if (def.isList && node.props && node.props.ordered) {
+    classNames = classNames.replace('list-disc', 'list-decimal');
   }
 
   if (classNames.trim()) {
@@ -222,11 +305,26 @@ function generateJSX(nodes, nodeId) {
     jsxProps.push(styleAttr);
   }
 
-  // ---------- Handle form field components ----------
+  // ---------- Handle special component types ----------
 
   if (def.isFormField) {
     const formChildren = buildFormFieldChildren(def, node.props || {});
     children.push(...formChildren);
+  }
+
+  if (def.isAlert) {
+    const alertChildren = buildAlertChildren(node.props || {});
+    children.push(...alertChildren);
+  }
+
+  if (def.isAvatar) {
+    const avatarChildren = buildAvatarChildren(node.props || {});
+    children.push(...avatarChildren);
+  }
+
+  if (def.isList) {
+    const listChildren = buildListChildren(node.props || {});
+    children.push(...listChildren);
   }
 
   // ---------- Process Craft.js child nodes ----------

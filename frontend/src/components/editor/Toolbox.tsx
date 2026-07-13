@@ -4,7 +4,6 @@ import { Search } from 'lucide-react';
 import { componentRegistry, getComponentsByCategory } from '../../shared/component-registry';
 
 // ------ Component map: registry name → React component import ------
-// This maps registry keys to actual component references for Craft.js connectors.create()
 import { Container } from '../user/Container';
 import { Text } from '../user/Text';
 import { Heading } from '../user/Heading';
@@ -19,6 +18,12 @@ import { DividerComponent } from '../user/DividerComponent';
 import { LoginForm } from '../user/LoginForm';
 import { HeroSection } from '../user/HeroSection';
 import { ContactForm } from '../user/ContactForm';
+import { AlertComponent } from '../user/AlertComponent';
+import { AvatarComponent } from '../user/AvatarComponent';
+import { ListComponent } from '../user/ListComponent';
+import { PricingCard } from '../user/PricingCard';
+import { TestimonialCard } from '../user/TestimonialCard';
+import { NewsletterSection } from '../user/NewsletterSection';
 
 const componentMap: Record<string, React.ComponentType<any>> = {
   Container,
@@ -35,6 +40,12 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   LoginForm,
   HeroSection,
   ContactForm,
+  AlertComponent,
+  AvatarComponent,
+  ListComponent,
+  PricingCard,
+  TestimonialCard,
+  NewsletterSection,
 };
 
 // ------ Helpers to build default JSX elements for drag ------

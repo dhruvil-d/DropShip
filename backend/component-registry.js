@@ -3,7 +3,8 @@
 // ============================================================
 // Mirror of the frontend registry's compilation metadata.
 // Contains ONLY the fields needed for JSX generation:
-//   tagName, baseClasses, propBehaviors, variantClasses, selfClosing
+//   tagName, baseClasses, propBehaviors, variantClasses,
+//   selfClosing, booleanClasses, formLabelClasses, formFieldClasses
 //
 // When you add a new component to the frontend registry,
 // add its compilation entry here too.
@@ -27,7 +28,9 @@ const registry = {
       shadow:        { type: 'skip' },
       minHeight:     { type: 'style', cssProp: 'minHeight', suffix: 'px' },
     },
-    variantClasses: {},
+    variantClasses: {
+      shadow: { none: '', sm: 'shadow-sm', md: 'shadow-md', lg: 'shadow-lg', xl: 'shadow-xl' },
+    },
   },
 
   // ==================== BASIC ====================
@@ -85,6 +88,10 @@ const registry = {
         lg: 'px-6 py-3 text-lg',
       },
     },
+    // Boolean props that add a class when true
+    booleanClasses: {
+      fullWidth: 'w-full',
+    },
   },
 
   ImageComponent: {
@@ -112,6 +119,8 @@ const registry = {
     selfClosing: false,
     isFormField: true,
     formFieldTag: 'input',
+    formLabelClasses: 'text-sm font-medium text-gray-700',
+    formFieldClasses: 'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
     propBehaviors: {
       label:       { type: 'skip' },
       placeholder: { type: 'skip' },
@@ -127,6 +136,8 @@ const registry = {
     selfClosing: false,
     isFormField: true,
     formFieldTag: 'textarea',
+    formLabelClasses: 'text-sm font-medium text-gray-700',
+    formFieldClasses: 'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
     propBehaviors: {
       label:       { type: 'skip' },
       placeholder: { type: 'skip' },
@@ -142,6 +153,8 @@ const registry = {
     selfClosing: false,
     isFormField: true,
     formFieldTag: 'select',
+    formLabelClasses: 'text-sm font-medium text-gray-700',
+    formFieldClasses: 'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
     propBehaviors: {
       label:    { type: 'skip' },
       options:  { type: 'skip' },
@@ -164,7 +177,9 @@ const registry = {
       borderWidth:  { type: 'style', cssProp: 'borderWidth', suffix: 'px' },
       borderColor:  { type: 'style', cssProp: 'borderColor' },
     },
-    variantClasses: {},
+    variantClasses: {
+      shadow: { none: '', sm: 'shadow-sm', md: 'shadow-md', lg: 'shadow-lg', xl: 'shadow-xl' },
+    },
   },
 
   BadgeComponent: {
@@ -194,6 +209,66 @@ const registry = {
       color:   { type: 'style', cssProp: 'borderColor' },
       marginY: { type: 'style', cssProp: 'marginBlock', suffix: 'px' },
     },
+    variantClasses: {},
+  },
+
+  AlertComponent: {
+    tagName: 'div',
+    baseClasses: 'flex items-start gap-3 p-4 rounded-lg border',
+    selfClosing: false,
+    propBehaviors: {
+      title:       { type: 'skip' },
+      message:     { type: 'skip' },
+      variant:     { type: 'skip' },
+      dismissible: { type: 'skip' },
+    },
+    isAlert: true,
+    variantClasses: {
+      variant: {
+        info:    'bg-blue-50 border-blue-200 text-blue-800',
+        success: 'bg-green-50 border-green-200 text-green-800',
+        warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+        error:   'bg-red-50 border-red-200 text-red-800',
+      },
+    },
+  },
+
+  AvatarComponent: {
+    tagName: 'div',
+    baseClasses: 'inline-flex items-center justify-center bg-gray-200 text-gray-600 font-medium overflow-hidden',
+    selfClosing: false,
+    propBehaviors: {
+      src:          { type: 'skip' },
+      alt:          { type: 'skip' },
+      fallbackText: { type: 'skip' },
+      size:         { type: 'skip' },
+      shape:        { type: 'skip' },
+    },
+    isAvatar: true,
+    variantClasses: {
+      size: {
+        sm: 'w-8 h-8 text-xs',
+        md: 'w-10 h-10 text-sm',
+        lg: 'w-14 h-14 text-base',
+        xl: 'w-20 h-20 text-lg',
+      },
+      shape: {
+        circle:  'rounded-full',
+        rounded: 'rounded-lg',
+      },
+    },
+  },
+
+  ListComponent: {
+    tagName: 'ul',
+    baseClasses: 'list-disc pl-5 space-y-1',
+    selfClosing: false,
+    propBehaviors: {
+      items:   { type: 'skip' },
+      ordered: { type: 'skip' },
+      spacing: { type: 'skip' },
+    },
+    isList: true,
     variantClasses: {},
   },
 
@@ -234,6 +309,46 @@ const registry = {
       padding:    { type: 'style', cssProp: 'padding', suffix: 'px' },
       gap:        { type: 'style', cssProp: 'gap', suffix: 'px' },
       background: { type: 'style', cssProp: 'backgroundColor' },
+    },
+    variantClasses: {},
+  },
+
+  PricingCard: {
+    tagName: 'div',
+    baseClasses: '',
+    selfClosing: false,
+    propBehaviors: {
+      padding:      { type: 'style', cssProp: 'padding', suffix: 'px' },
+      background:   { type: 'style', cssProp: 'backgroundColor' },
+      borderRadius: { type: 'style', cssProp: 'borderRadius', suffix: 'px' },
+      highlighted:  { type: 'skip' },
+    },
+    booleanClasses: {
+      highlighted: 'ring-2 ring-blue-500',
+    },
+    variantClasses: {},
+  },
+
+  TestimonialCard: {
+    tagName: 'div',
+    baseClasses: '',
+    selfClosing: false,
+    propBehaviors: {
+      padding:      { type: 'style', cssProp: 'padding', suffix: 'px' },
+      background:   { type: 'style', cssProp: 'backgroundColor' },
+      borderRadius: { type: 'style', cssProp: 'borderRadius', suffix: 'px' },
+    },
+    variantClasses: {},
+  },
+
+  NewsletterSection: {
+    tagName: 'div',
+    baseClasses: '',
+    selfClosing: false,
+    propBehaviors: {
+      padding:    { type: 'style', cssProp: 'padding', suffix: 'px' },
+      background: { type: 'style', cssProp: 'backgroundColor' },
+      textAlign:  { type: 'style', cssProp: 'textAlign' },
     },
     variantClasses: {},
   },

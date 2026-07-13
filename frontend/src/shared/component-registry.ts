@@ -13,6 +13,7 @@ import {
   Type, Square, LayoutTemplate, Heading1, ImageIcon,
   TextCursorInput, AlignLeft, ListOrdered, RectangleHorizontal,
   Tag, Minus, LogIn, Sparkles, Mail,
+  AlertCircle, CircleUserRound, List, CreditCard, Quote, Newspaper,
 } from 'lucide-react';
 
 // ------ Type Definitions ------
@@ -533,6 +534,131 @@ export const componentRegistry: Record<string, ComponentDefinition> = {
     ],
   },
 
+  AlertComponent: {
+    name: 'AlertComponent',
+    category: 'Data Display',
+    icon: AlertCircle,
+    description: 'Dismissible alert/notification',
+    tagName: 'div',
+    baseClasses: 'flex items-start gap-3 p-4 rounded-lg border',
+    isCanvas: false,
+    variantClasses: {
+      variant: {
+        info:    'bg-blue-50 border-blue-200 text-blue-800',
+        success: 'bg-green-50 border-green-200 text-green-800',
+        warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+        error:   'bg-red-50 border-red-200 text-red-800',
+      },
+    },
+    props: [
+      {
+        name: 'title', label: 'Title', control: 'text', defaultValue: 'Heads up!',
+        behavior: { type: 'skip' }, group: 'Content',
+      },
+      {
+        name: 'message', label: 'Message', control: 'textarea', defaultValue: 'This is an informational alert message.',
+        behavior: { type: 'skip' }, group: 'Content',
+      },
+      {
+        name: 'variant', label: 'Variant', control: 'select', defaultValue: 'info',
+        options: [
+          { label: 'Info', value: 'info' },
+          { label: 'Success', value: 'success' },
+          { label: 'Warning', value: 'warning' },
+          { label: 'Error', value: 'error' },
+        ],
+        behavior: { type: 'skip' }, group: 'Style',
+      },
+      {
+        name: 'dismissible', label: 'Dismissible', control: 'boolean', defaultValue: false,
+        behavior: { type: 'skip' }, group: 'Behavior',
+      },
+    ],
+  },
+
+  AvatarComponent: {
+    name: 'AvatarComponent',
+    category: 'Data Display',
+    icon: CircleUserRound,
+    description: 'User avatar with fallback',
+    tagName: 'div',
+    baseClasses: 'inline-flex items-center justify-center bg-gray-200 text-gray-600 font-medium overflow-hidden',
+    isCanvas: false,
+    variantClasses: {
+      size: {
+        sm: 'w-8 h-8 text-xs',
+        md: 'w-10 h-10 text-sm',
+        lg: 'w-14 h-14 text-base',
+        xl: 'w-20 h-20 text-lg',
+      },
+      shape: {
+        circle: 'rounded-full',
+        rounded: 'rounded-lg',
+      },
+    },
+    props: [
+      {
+        name: 'src', label: 'Image URL', control: 'text', defaultValue: '',
+        behavior: { type: 'skip' }, group: 'Content',
+      },
+      {
+        name: 'alt', label: 'Alt Text', control: 'text', defaultValue: 'Avatar',
+        behavior: { type: 'skip' }, group: 'Content',
+      },
+      {
+        name: 'fallbackText', label: 'Fallback Text', control: 'text', defaultValue: 'JD',
+        behavior: { type: 'skip' }, group: 'Content',
+      },
+      {
+        name: 'size', label: 'Size', control: 'select', defaultValue: 'md',
+        options: [
+          { label: 'Small', value: 'sm' },
+          { label: 'Medium', value: 'md' },
+          { label: 'Large', value: 'lg' },
+          { label: 'Extra Large', value: 'xl' },
+        ],
+        behavior: { type: 'skip' }, group: 'Style',
+      },
+      {
+        name: 'shape', label: 'Shape', control: 'select', defaultValue: 'circle',
+        options: [
+          { label: 'Circle', value: 'circle' },
+          { label: 'Rounded', value: 'rounded' },
+        ],
+        behavior: { type: 'skip' }, group: 'Style',
+      },
+    ],
+  },
+
+  ListComponent: {
+    name: 'ListComponent',
+    category: 'Data Display',
+    icon: List,
+    description: 'Ordered or unordered list',
+    tagName: 'ul',
+    baseClasses: 'list-disc pl-5 space-y-1',
+    isCanvas: false,
+    props: [
+      {
+        name: 'items', label: 'Items (comma-separated)', control: 'textarea', defaultValue: 'First item, Second item, Third item',
+        behavior: { type: 'skip' }, group: 'Content',
+      },
+      {
+        name: 'ordered', label: 'Ordered (numbered)', control: 'boolean', defaultValue: false,
+        behavior: { type: 'skip' }, group: 'Style',
+      },
+      {
+        name: 'spacing', label: 'Spacing', control: 'select', defaultValue: 'normal',
+        options: [
+          { label: 'Tight', value: 'tight' },
+          { label: 'Normal', value: 'normal' },
+          { label: 'Relaxed', value: 'relaxed' },
+        ],
+        behavior: { type: 'skip' }, group: 'Style',
+      },
+    ],
+  },
+
   // ==================== COMPOSITE ====================
 
   LoginForm: {
@@ -631,6 +757,106 @@ export const componentRegistry: Record<string, ComponentDefinition> = {
       { component: 'InputComponent', props: { label: 'Email', type: 'email', placeholder: 'you@example.com' } },
       { component: 'TextareaComponent', props: { label: 'Message', placeholder: 'Your message...', rows: 4 } },
       { component: 'Button', props: { text: 'Send Message', variant: 'primary', size: 'md' } },
+    ],
+  },
+
+  PricingCard: {
+    name: 'PricingCard',
+    category: 'Composite',
+    icon: CreditCard,
+    description: 'Pre-built pricing card',
+    tagName: 'div',
+    baseClasses: '',
+    isCanvas: true,
+    props: [
+      {
+        name: 'padding', label: 'Padding', control: 'number', defaultValue: 32,
+        behavior: { type: 'style', cssProp: 'padding', suffix: 'px' }, group: 'Layout',
+      },
+      {
+        name: 'background', label: 'Background', control: 'color', defaultValue: '#ffffff',
+        behavior: { type: 'style', cssProp: 'backgroundColor' }, group: 'Colors',
+      },
+      {
+        name: 'borderRadius', label: 'Border Radius', control: 'number', defaultValue: 12,
+        behavior: { type: 'style', cssProp: 'borderRadius', suffix: 'px' }, group: 'Borders',
+      },
+      {
+        name: 'highlighted', label: 'Highlighted (Popular)', control: 'boolean', defaultValue: false,
+        behavior: { type: 'skip' }, group: 'Style',
+      },
+    ],
+    defaultChildren: [
+      { component: 'Heading', props: { text: 'Pro Plan', level: 'h3', fontSize: 24 } },
+      { component: 'Text', props: { text: '$29/month', fontSize: 36, fontWeight: '700', color: '#111827' } },
+      { component: 'Text', props: { text: 'Everything you need to grow your business', fontSize: 14, color: '#6b7280' } },
+      { component: 'ListComponent', props: { items: 'Unlimited projects, Priority support, Advanced analytics, Custom domain', ordered: false, spacing: 'normal' } },
+      { component: 'Button', props: { text: 'Get Started', variant: 'primary', size: 'lg', fullWidth: true } },
+    ],
+  },
+
+  TestimonialCard: {
+    name: 'TestimonialCard',
+    category: 'Composite',
+    icon: Quote,
+    description: 'Customer testimonial card',
+    tagName: 'div',
+    baseClasses: '',
+    isCanvas: true,
+    props: [
+      {
+        name: 'padding', label: 'Padding', control: 'number', defaultValue: 24,
+        behavior: { type: 'style', cssProp: 'padding', suffix: 'px' }, group: 'Layout',
+      },
+      {
+        name: 'background', label: 'Background', control: 'color', defaultValue: '#ffffff',
+        behavior: { type: 'style', cssProp: 'backgroundColor' }, group: 'Colors',
+      },
+      {
+        name: 'borderRadius', label: 'Border Radius', control: 'number', defaultValue: 12,
+        behavior: { type: 'style', cssProp: 'borderRadius', suffix: 'px' }, group: 'Borders',
+      },
+    ],
+    defaultChildren: [
+      { component: 'Text', props: { text: '"This product completely transformed how we work. The team collaboration features are incredible and the support is outstanding."', fontSize: 16, fontWeight: '400', color: '#374151', lineHeight: 1.6 } },
+      { component: 'AvatarComponent', props: { src: '', fallbackText: 'JD', size: 'md', shape: 'circle', alt: 'Jane Doe' } },
+      { component: 'Text', props: { text: 'Jane Doe', fontSize: 14, fontWeight: '600', color: '#111827' } },
+      { component: 'Text', props: { text: 'CEO at TechCorp', fontSize: 12, fontWeight: '400', color: '#9ca3af' } },
+    ],
+  },
+
+  NewsletterSection: {
+    name: 'NewsletterSection',
+    category: 'Composite',
+    icon: Newspaper,
+    description: 'Email signup section',
+    tagName: 'div',
+    baseClasses: '',
+    isCanvas: true,
+    props: [
+      {
+        name: 'padding', label: 'Padding', control: 'number', defaultValue: 48,
+        behavior: { type: 'style', cssProp: 'padding', suffix: 'px' }, group: 'Layout',
+      },
+      {
+        name: 'background', label: 'Background', control: 'color', defaultValue: '#f0f9ff',
+        behavior: { type: 'style', cssProp: 'backgroundColor' }, group: 'Colors',
+      },
+      {
+        name: 'textAlign', label: 'Text Align', control: 'select', defaultValue: 'center',
+        options: [
+          { label: 'Left', value: 'left' },
+          { label: 'Center', value: 'center' },
+          { label: 'Right', value: 'right' },
+        ],
+        behavior: { type: 'style', cssProp: 'textAlign' }, group: 'Typography',
+      },
+    ],
+    defaultChildren: [
+      { component: 'Heading', props: { text: 'Stay Updated', level: 'h2', fontSize: 28, textAlign: 'center' } },
+      { component: 'Text', props: { text: 'Subscribe to our newsletter for the latest updates, tips, and exclusive offers.', fontSize: 16, color: '#6b7280', textAlign: 'center' } },
+      { component: 'InputComponent', props: { label: 'Email Address', type: 'email', placeholder: 'you@example.com' } },
+      { component: 'Button', props: { text: 'Subscribe', variant: 'primary', size: 'md' } },
     ],
   },
 };

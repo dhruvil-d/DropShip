@@ -18,6 +18,12 @@ import { DividerComponent } from './components/user/DividerComponent';
 import { LoginForm } from './components/user/LoginForm';
 import { HeroSection } from './components/user/HeroSection';
 import { ContactForm } from './components/user/ContactForm';
+import { AlertComponent } from './components/user/AlertComponent';
+import { AvatarComponent } from './components/user/AvatarComponent';
+import { ListComponent } from './components/user/ListComponent';
+import { PricingCard } from './components/user/PricingCard';
+import { TestimonialCard } from './components/user/TestimonialCard';
+import { NewsletterSection } from './components/user/NewsletterSection';
 
 // Dynamic resolver — maps component displayName to the actual React component.
 // When you add a new component, add it here AND in the component-registry.
@@ -36,6 +42,12 @@ const resolver = {
   LoginForm,
   HeroSection,
   ContactForm,
+  AlertComponent,
+  AvatarComponent,
+  ListComponent,
+  PricingCard,
+  TestimonialCard,
+  NewsletterSection,
 };
 
 function App() {
