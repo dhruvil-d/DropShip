@@ -1,40 +1,189 @@
-import React from 'react';
-import { useEditor } from '@craftjs/core';
-import { Button as CraftButton } from '../user/Button';
-import { Text as CraftText } from '../user/Text';
-import { Container as CraftContainer } from '../user/Container';
-import { Type, Square, LayoutTemplate } from 'lucide-react';
+import React, { useState } from 'react';
+import { useEditor, Element } from '@craftjs/core';
+import { Search } from 'lucide-react';
+import { componentRegistry, getComponentsByCategory } from '../../shared/component-registry';
+
+// ------ Component map: registry name → React component import ------
+// This maps registry keys to actual component references for Craft.js connectors.create()
+import { Container } from '../user/Container';
+import { Text } from '../user/Text';
+import { Heading } from '../user/Heading';
+import { Button } from '../user/Button';
+import { ImageComponent } from '../user/ImageComponent';
+import { InputComponent } from '../user/InputComponent';
+import { TextareaComponent } from '../user/TextareaComponent';
+import { SelectComponent } from '../user/SelectComponent';
+import { CardComponent } from '../user/CardComponent';
+import { BadgeComponent } from '../user/BadgeComponent';
+import { DividerComponent } from '../user/DividerComponent';
+import { LoginForm } from '../user/LoginForm';
+import { HeroSection } from '../user/HeroSection';
+import { ContactForm } from '../user/ContactForm';
+
+const componentMap: Record<string, React.ComponentType<any>> = {
+  Container,
+  Text,
+  Heading,
+  Button,
+  ImageComponent,
+  InputComponent,
+  TextareaComponent,
+  SelectComponent,
+  CardComponent,
+  BadgeComponent,
+  DividerComponent,
+  LoginForm,
+  HeroSection,
+  ContactForm,
+};
+
+// ------ Helpers to build default JSX elements for drag ------
+
+function buildDefaultElement(name: string): React.ReactElement | null {
+  const def = componentRegistry[name];
+  const Component = componentMap[name];
+  if (!def || !Component) return null;
+
+  // Extract default props from the registry
+  const defaultProps: Record<string, unknown> = {};
+  for (const prop of def.props) {
+    defaultProps[prop.name] = prop.defaultValue;
+  }
+
+  // For canvas components (containers), wrap in <Element> so children can be dropped inside
+  if (def.isCanvas) {
+    // Build default children for composite components
+    if (def.defaultChildren && def.defaultChildren.length > 0) {
+      const children = def.defaultChildren.map((child, i) => {
+        const ChildComponent = componentMap[child.component];
+        if (!ChildComponent) return null;
+
+        const childDef = componentRegistry[child.component];
+        if (childDef && childDef.isCanvas) {
+          return <Element key={i} is={ChildComponent} canvas {...child.props} />;
+        }
+        return <ChildComponent key={i} {...child.props} />;
+      }).filter(Boolean);
+
+      return <Element is={Component} canvas {...defaultProps}>{children}</Element>;
+    }
+
+    return <Element is={Component} canvas {...defaultProps} />;
+  }
+
+  return <Component {...defaultProps} />;
+}
+
+// ------ Category icon colors ------
+const categoryColors: Record<string, string> = {
+  Layout: 'text-purple-500',
+  Basic: 'text-blue-500',
+  Forms: 'text-green-500',
+  'Data Display': 'text-amber-500',
+  Composite: 'text-rose-500',
+};
 
 export const Toolbox = () => {
   const { connectors: { create } } = useEditor();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
+
+  const categories = getComponentsByCategory();
+
+  const toggleCategory = (category: string) => {
+    setCollapsedCategories(prev => {
+      const next = new Set(prev);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+      return next;
+    });
+  };
+
+  // Filter components by search
+  const filteredCategories = searchQuery.trim()
+    ? categories.map(cat => ({
+        ...cat,
+        components: cat.components.filter(comp =>
+          comp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          comp.description.toLowerCase().includes(searchQuery.toLowerCase())
+        ),
+      })).filter(cat => cat.components.length > 0)
+    : categories;
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 p-4 h-full flex flex-col gap-4">
-      <h3 className="font-semibold text-gray-700 uppercase text-xs tracking-wider mb-2">Components</h3>
-      
-      <button 
-        ref={ref => { if (ref) create(ref, <CraftText text="New Text" fontSize={16} />); }}
-        className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 text-left transition-all cursor-grab"
-      >
-        <Type size={18} className="text-gray-500" />
-        <span className="text-sm font-medium text-gray-700">Text</span>
-      </button>
+    <div className="w-64 bg-white border-r border-gray-200 h-full flex flex-col">
+      {/* Header */}
+      <div className="p-3 border-b border-gray-100">
+        <h3 className="font-semibold text-gray-700 uppercase text-xs tracking-wider mb-2">Components</h3>
+        <div className="relative">
+          <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search components..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400"
+          />
+        </div>
+      </div>
 
-      <button 
-        ref={ref => { if (ref) create(ref, <CraftButton text="Button" variant="primary" />); }}
-        className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 text-left transition-all cursor-grab"
-      >
-        <Square size={18} className="text-gray-500" />
-        <span className="text-sm font-medium text-gray-700">Button</span>
-      </button>
+      {/* Component list */}
+      <div className="flex-1 overflow-y-auto p-2">
+        {filteredCategories.map(({ category, components }) => (
+          <div key={category} className="mb-1">
+            {/* Category header */}
+            <button
+              onClick={() => toggleCategory(category)}
+              className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:bg-gray-50 rounded"
+            >
+              <span className={categoryColors[category] || 'text-gray-500'}>{category}</span>
+              <span className="text-gray-400 text-[10px]">
+                {collapsedCategories.has(category) ? '▸' : '▾'}
+              </span>
+            </button>
 
-      <button 
-        ref={ref => { if (ref) create(ref, <CraftContainer background="#f3f4f6" padding={20} />); }}
-        className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 text-left transition-all cursor-grab"
-      >
-        <LayoutTemplate size={18} className="text-gray-500" />
-        <span className="text-sm font-medium text-gray-700">Container</span>
-      </button>
+            {/* Component cards */}
+            {!collapsedCategories.has(category) && (
+              <div className="flex flex-col gap-1 mt-1 mb-2">
+                {components.map(comp => {
+                  const Icon = comp.icon;
+                  return (
+                    <button
+                      key={comp.name}
+                      ref={ref => {
+                        if (ref) {
+                          const element = buildDefaultElement(comp.name);
+                          if (element) {
+                            create(ref, element);
+                          }
+                        }
+                      }}
+                      className="flex items-start gap-2.5 p-2 border border-gray-100 rounded-lg hover:border-blue-300 hover:bg-blue-50/50 text-left transition-all cursor-grab active:cursor-grabbing group"
+                    >
+                      <div className="mt-0.5 p-1 rounded bg-gray-50 group-hover:bg-blue-100/50 transition-colors">
+                        <Icon size={14} className="text-gray-500 group-hover:text-blue-600 transition-colors" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium text-gray-700 leading-tight">{comp.name.replace('Component', '')}</div>
+                        <div className="text-[11px] text-gray-400 leading-snug mt-0.5 truncate">{comp.description}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ))}
+
+        {filteredCategories.length === 0 && (
+          <div className="text-center text-sm text-gray-400 py-8">
+            No components match "{searchQuery}"
+          </div>
+        )}
+      </div>
     </div>
   );
 };

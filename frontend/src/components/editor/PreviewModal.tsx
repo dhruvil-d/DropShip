@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Sandpack } from '@codesandbox/sandpack-react';
 import { X } from 'lucide-react';
 

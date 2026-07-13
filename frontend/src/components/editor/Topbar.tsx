@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useEditor } from '@craftjs/core';
-import { Play, Code, Save, Undo, Redo, Loader2 } from 'lucide-react';
+import { Play, Undo, Redo, Loader2 } from 'lucide-react';
 import { PreviewModal } from './PreviewModal';
 
 export const Topbar = () => {
-  const { actions, query, canUndo, canRedo } = useEditor((state, query) => ({
+  const { actions, query, canUndo, canRedo } = useEditor((_state, query) => ({
     canUndo: query.history.canUndo(),
     canRedo: query.history.canRedo(),
   }));

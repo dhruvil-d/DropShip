@@ -1,4 +1,4 @@
-import React from 'react';
+import { createElement } from 'react';
 import { useEditor } from '@craftjs/core';
 
 export const SettingsPanel = () => {
@@ -39,7 +39,7 @@ export const SettingsPanel = () => {
           </div>
           
           <div data-cy="settings-panel">
-            {selected.settings ? React.createElement(selected.settings) : (
+            {selected.settings ? createElement(selected.settings) : (
               <div className="text-sm text-gray-500 italic">No settings available for this component.</div>
             )}
           </div>
