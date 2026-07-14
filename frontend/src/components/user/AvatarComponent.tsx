@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 interface AvatarComponentProps {
   src: string;
@@ -21,18 +24,24 @@ const shapeClasses: Record<string, string> = {
 };
 
 export const AvatarComponent = ({ src, alt, fallbackText, size, shape }: AvatarComponentProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const elementRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
-      ref={(ref) => { if (ref) connect(drag(ref)); }}
+      ref={(ref) => {
+        elementRef.current = ref;
+        connectRef(ref);
+      }}
       className={`inline-flex items-center justify-center bg-gray-200 text-gray-600 font-medium overflow-hidden outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move ${sizeClasses[size] || ''} ${shapeClasses[shape] || ''}`}
+      style={{ position: 'relative', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', ...responsiveStyles }}
     >
       {src ? (
         <img src={src} alt={alt} className="w-full h-full object-cover" />
       ) : (
         <span>{fallbackText || '?'}</span>
       )}
+      {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
     </div>
   );
 };

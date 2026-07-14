@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 
 interface ButtonProps {
@@ -22,7 +25,8 @@ const sizeClasses: Record<string, string> = {
 };
 
 export const Button = ({ text, variant, size, disabled, fullWidth }: ButtonProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const elementRef = useRef<HTMLButtonElement>(null);
 
   const classes = [
     'rounded font-medium cursor-move border-0 outline-transparent',
@@ -35,11 +39,20 @@ export const Button = ({ text, variant, size, disabled, fullWidth }: ButtonProps
 
   return (
     <button
-      ref={(ref) => { if (ref) connect(drag(ref)); }}
+      ref={(ref) => {
+        elementRef.current = ref;
+        connectRef(ref);
+      }}
       className={classes}
       disabled={disabled}
+      style={{
+        position: 'relative',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        ...responsiveStyles,
+      }}
     >
       {text}
+      {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
     </button>
   );
 };

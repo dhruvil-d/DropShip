@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 interface NewsletterSectionProps {
   padding: number;
@@ -8,11 +11,15 @@ interface NewsletterSectionProps {
 }
 
 export const NewsletterSection = ({ padding, background, textAlign, children }: NewsletterSectionProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const elementRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
-      ref={(ref) => { if (ref) connect(drag(ref)); }}
+      ref={(ref) => {
+        elementRef.current = ref;
+        connectRef(ref);
+      }}
       style={{
         padding: `${padding}px`,
         backgroundColor: background,
@@ -21,15 +28,17 @@ export const NewsletterSection = ({ padding, background, textAlign, children }: 
         flexDirection: 'column',
         gap: '16px',
         alignItems: textAlign === 'center' ? 'center' : textAlign === 'right' ? 'flex-end' : 'flex-start',
+        position: 'relative',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        ...responsiveStyles,
       }}
       className="outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all min-h-[100px] rounded-lg"
     >
       {children}
+      {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
     </div>
   );
 };
-
-// ------ Settings Panel ------
 
 const NewsletterSettings = () => {
   const { actions: { setProp }, props } = useNode((node) => ({
@@ -55,7 +64,6 @@ const NewsletterSettings = () => {
           </select>
         </label>
       </div>
-
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Colors</h4>
         <label className="text-xs text-gray-600 flex items-center gap-2">
@@ -71,15 +79,7 @@ const NewsletterSettings = () => {
 
 NewsletterSection.craft = {
   displayName: 'NewsletterSection',
-  props: {
-    padding: 48,
-    background: '#f0f9ff',
-    textAlign: 'center',
-  } as NewsletterSectionProps,
-  related: {
-    settings: NewsletterSettings,
-  },
-  rules: {
-    canDrag: () => true,
-  },
+  props: { padding: 48, background: '#f0f9ff', textAlign: 'center' } as NewsletterSectionProps,
+  related: { settings: NewsletterSettings },
+  rules: { canDrag: () => true },
 };

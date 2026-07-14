@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 
 interface LoginFormProps {
@@ -10,11 +13,15 @@ interface LoginFormProps {
 }
 
 export const LoginForm = ({ padding, gap, background, borderRadius, children }: LoginFormProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const elementRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
-      ref={(ref) => { if (ref) connect(drag(ref)); }}
+      ref={(ref) => {
+        elementRef.current = ref;
+        connectRef(ref);
+      }}
       style={{
         padding: `${padding}px`,
         gap: `${gap}px`,
@@ -23,15 +30,17 @@ export const LoginForm = ({ padding, gap, background, borderRadius, children }: 
         display: 'flex',
         flexDirection: 'column',
         border: '1px solid #e5e7eb',
+        position: 'relative',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        ...responsiveStyles,
       }}
       className="shadow-md outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all min-h-[100px]"
     >
       {children}
+      {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
     </div>
   );
 };
-
-// ------ Settings Panel ------
 
 const LoginFormSettings = () => {
   const { actions: { setProp }, props } = useNode((node) => ({
@@ -60,7 +69,6 @@ const LoginFormSettings = () => {
             className="w-full mt-1 px-2 py-1 border border-gray-200 rounded text-sm" />
         </label>
       </div>
-
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Colors</h4>
         <label className="text-xs text-gray-600 flex items-center gap-2">
@@ -76,16 +84,7 @@ const LoginFormSettings = () => {
 
 LoginForm.craft = {
   displayName: 'LoginForm',
-  props: {
-    padding: 32,
-    gap: 16,
-    background: '#ffffff',
-    borderRadius: 8,
-  } as LoginFormProps,
-  related: {
-    settings: LoginFormSettings,
-  },
-  rules: {
-    canDrag: () => true,
-  },
+  props: { padding: 32, gap: 16, background: '#ffffff', borderRadius: 8 } as LoginFormProps,
+  related: { settings: LoginFormSettings },
+  rules: { canDrag: () => true },
 };

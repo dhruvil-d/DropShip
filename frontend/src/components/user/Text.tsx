@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 
 interface TextProps {
@@ -11,21 +14,45 @@ interface TextProps {
 }
 
 export const Text = ({ text, fontSize, fontWeight, color, textAlign, lineHeight }: TextProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const { actions: { setProp } } = useNode();
+  const elementRef = useRef<HTMLParagraphElement>(null);
+  const startFontSizeRef = useRef(fontSize);
 
   return (
     <p
-      ref={(ref) => { if (ref) connect(drag(ref)); }}
+      ref={(ref) => {
+        elementRef.current = ref;
+        connectRef(ref);
+      }}
       style={{
         fontSize: `${fontSize}px`,
         fontWeight,
         color,
         textAlign,
         lineHeight,
+        position: 'relative',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        ...responsiveStyles,
       }}
       className="m-0 p-1 outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move"
     >
       {text}
+      {isSelected && <ResizeHandles 
+        nodeId={nodeId} 
+        targetRef={elementRef} 
+        onResizeStart={() => {
+          startFontSizeRef.current = fontSize;
+        }}
+        onResize={(w, _h, startW) => {
+          if (startW > 0 && w !== startW) {
+            const scale = w / startW;
+            setProp((p: TextProps) => {
+              p.fontSize = Math.max(8, Math.round(startFontSizeRef.current * scale));
+            });
+          }
+        }}
+      />}
     </p>
   );
 };

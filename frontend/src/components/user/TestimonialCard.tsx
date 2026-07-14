@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 interface TestimonialCardProps {
   padding: number;
@@ -8,11 +11,15 @@ interface TestimonialCardProps {
 }
 
 export const TestimonialCard = ({ padding, background, borderRadius, children }: TestimonialCardProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const elementRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
-      ref={(ref) => { if (ref) connect(drag(ref)); }}
+      ref={(ref) => {
+        elementRef.current = ref;
+        connectRef(ref);
+      }}
       style={{
         padding: `${padding}px`,
         backgroundColor: background,
@@ -21,15 +28,17 @@ export const TestimonialCard = ({ padding, background, borderRadius, children }:
         flexDirection: 'column',
         gap: '12px',
         border: '1px solid #e5e7eb',
+        position: 'relative',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        ...responsiveStyles,
       }}
       className="shadow-sm outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all min-h-[100px]"
     >
       {children}
+      {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
     </div>
   );
 };
-
-// ------ Settings Panel ------
 
 const TestimonialCardSettings = () => {
   const { actions: { setProp }, props } = useNode((node) => ({
@@ -53,7 +62,6 @@ const TestimonialCardSettings = () => {
           </label>
         </div>
       </div>
-
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Colors</h4>
         <label className="text-xs text-gray-600 flex items-center gap-2">
@@ -69,15 +77,7 @@ const TestimonialCardSettings = () => {
 
 TestimonialCard.craft = {
   displayName: 'TestimonialCard',
-  props: {
-    padding: 24,
-    background: '#ffffff',
-    borderRadius: 12,
-  } as TestimonialCardProps,
-  related: {
-    settings: TestimonialCardSettings,
-  },
-  rules: {
-    canDrag: () => true,
-  },
+  props: { padding: 24, background: '#ffffff', borderRadius: 12 } as TestimonialCardProps,
+  related: { settings: TestimonialCardSettings },
+  rules: { canDrag: () => true },
 };

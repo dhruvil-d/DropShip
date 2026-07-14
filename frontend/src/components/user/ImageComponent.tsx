@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 
 interface ImageComponentProps {
@@ -11,21 +14,28 @@ interface ImageComponentProps {
 }
 
 export const ImageComponent = ({ src, alt, objectFit, width, height, borderRadius }: ImageComponentProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const elementRef = useRef<HTMLImageElement>(null);
 
   return (
-    <img
-      ref={(ref) => { if (ref) connect(drag(ref)); }}
-      src={src}
-      alt={alt}
-      style={{
-        objectFit,
-        width,
-        height,
-        borderRadius: `${borderRadius}px`,
-      }}
-      className="max-w-full outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move block"
-    />
+    <div style={{ position: 'relative', display: 'inline-block', ...responsiveStyles, transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+      <img
+        ref={(ref) => {
+          elementRef.current = ref;
+          connectRef(ref);
+        }}
+        src={src}
+        alt={alt}
+        style={{
+          objectFit,
+          width: responsiveStyles.width || width,
+          height: responsiveStyles.height || height,
+          borderRadius: `${borderRadius}px`,
+        }}
+        className="max-w-full outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move block"
+      />
+      {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
+    </div>
   );
 };
 

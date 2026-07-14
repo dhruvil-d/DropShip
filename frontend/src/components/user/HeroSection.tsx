@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 
 interface HeroSectionProps {
@@ -9,11 +12,15 @@ interface HeroSectionProps {
 }
 
 export const HeroSection = ({ padding, background, textAlign, children }: HeroSectionProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const elementRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
-      ref={(ref) => { if (ref) connect(drag(ref)); }}
+      ref={(ref) => {
+        elementRef.current = ref;
+        connectRef(ref);
+      }}
       style={{
         padding: `${padding}px`,
         backgroundColor: background,
@@ -22,15 +29,17 @@ export const HeroSection = ({ padding, background, textAlign, children }: HeroSe
         flexDirection: 'column',
         alignItems: textAlign === 'center' ? 'center' : textAlign === 'right' ? 'flex-end' : 'flex-start',
         gap: '16px',
+        position: 'relative',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        ...responsiveStyles,
       }}
       className="min-h-[200px] outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all"
     >
       {children}
+      {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
     </div>
   );
 };
-
-// ------ Settings Panel ------
 
 const HeroSectionSettings = () => {
   const { actions: { setProp }, props } = useNode((node) => ({
@@ -56,7 +65,6 @@ const HeroSectionSettings = () => {
           </select>
         </label>
       </div>
-
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Colors</h4>
         <label className="text-xs text-gray-600 flex items-center gap-2">
@@ -72,15 +80,7 @@ const HeroSectionSettings = () => {
 
 HeroSection.craft = {
   displayName: 'HeroSection',
-  props: {
-    padding: 64,
-    background: '#f9fafb',
-    textAlign: 'center',
-  } as HeroSectionProps,
-  related: {
-    settings: HeroSectionSettings,
-  },
-  rules: {
-    canDrag: () => true,
-  },
+  props: { padding: 64, background: '#f9fafb', textAlign: 'center' } as HeroSectionProps,
+  related: { settings: HeroSectionSettings },
+  rules: { canDrag: () => true },
 };

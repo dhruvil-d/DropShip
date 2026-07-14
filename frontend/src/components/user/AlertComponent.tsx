@@ -1,5 +1,8 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
 import { AlertCircle, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 interface AlertComponentProps {
   title: string;
@@ -16,20 +19,26 @@ const variantConfig: Record<string, { bg: string; border: string; text: string; 
 };
 
 export const AlertComponent = ({ title, message, variant }: AlertComponentProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const elementRef = useRef<HTMLDivElement>(null);
   const config = variantConfig[variant] || variantConfig.info;
   const Icon = config.icon;
 
   return (
     <div
-      ref={(ref) => { if (ref) connect(drag(ref)); }}
+      ref={(ref) => {
+        elementRef.current = ref;
+        connectRef(ref);
+      }}
       className={`flex items-start gap-3 p-4 rounded-lg border ${config.bg} ${config.border} ${config.text} outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move`}
+      style={{ position: 'relative', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', ...responsiveStyles }}
     >
       <Icon size={20} className="mt-0.5 flex-shrink-0" />
       <div>
         {title && <strong className="block font-semibold mb-1">{title}</strong>}
         {message && <span className="text-sm">{message}</span>}
       </div>
+      {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
     </div>
   );
 };

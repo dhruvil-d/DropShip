@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 
 interface ContainerProps {
@@ -9,7 +12,7 @@ interface ContainerProps {
   background: string;
   borderRadius: number;
   shadow: 'none' | 'sm' | 'md' | 'lg' | 'xl';
-  minHeight: number;
+  minHeight: number | string;
   children?: React.ReactNode;
 }
 
@@ -25,11 +28,15 @@ export const Container = ({
   padding, margin, gap, flexDirection, background,
   borderRadius, shadow, minHeight, children,
 }: ContainerProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const elementRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
-      ref={(ref) => { if (ref) connect(drag(ref)); }}
+      ref={(ref) => {
+        elementRef.current = ref;
+        connectRef(ref);
+      }}
       style={{
         padding: `${padding}px`,
         margin: `${margin}px`,
@@ -37,12 +44,16 @@ export const Container = ({
         flexDirection,
         backgroundColor: background,
         borderRadius: `${borderRadius}px`,
-        minHeight: `${minHeight}px`,
+        minHeight: typeof minHeight === 'number' ? `${minHeight}px` : minHeight,
         display: 'flex',
+        position: 'relative',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        ...responsiveStyles,
       }}
       className={`outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all ${shadowClasses[shadow] || ''}`}
     >
       {children}
+      {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
     </div>
   );
 };

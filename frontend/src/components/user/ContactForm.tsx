@@ -1,5 +1,7 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
-
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 interface ContactFormProps {
   padding: number;
@@ -9,11 +11,15 @@ interface ContactFormProps {
 }
 
 export const ContactForm = ({ padding, gap, background, children }: ContactFormProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const elementRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
-      ref={(ref) => { if (ref) connect(drag(ref)); }}
+      ref={(ref) => {
+        elementRef.current = ref;
+        connectRef(ref);
+      }}
       style={{
         padding: `${padding}px`,
         gap: `${gap}px`,
@@ -22,15 +28,17 @@ export const ContactForm = ({ padding, gap, background, children }: ContactFormP
         flexDirection: 'column',
         border: '1px solid #e5e7eb',
         borderRadius: '8px',
+        position: 'relative',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        ...responsiveStyles,
       }}
       className="shadow-md outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all min-h-[100px]"
     >
       {children}
+      {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
     </div>
   );
 };
-
-// ------ Settings Panel ------
 
 const ContactFormSettings = () => {
   const { actions: { setProp }, props } = useNode((node) => ({
@@ -54,7 +62,6 @@ const ContactFormSettings = () => {
           </label>
         </div>
       </div>
-
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Colors</h4>
         <label className="text-xs text-gray-600 flex items-center gap-2">
@@ -70,15 +77,7 @@ const ContactFormSettings = () => {
 
 ContactForm.craft = {
   displayName: 'ContactForm',
-  props: {
-    padding: 32,
-    gap: 16,
-    background: '#ffffff',
-  } as ContactFormProps,
-  related: {
-    settings: ContactFormSettings,
-  },
-  rules: {
-    canDrag: () => true,
-  },
+  props: { padding: 32, gap: 16, background: '#ffffff' } as ContactFormProps,
+  related: { settings: ContactFormSettings },
+  rules: { canDrag: () => true },
 };

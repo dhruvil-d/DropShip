@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 interface PricingCardProps {
   padding: number;
@@ -9,11 +12,15 @@ interface PricingCardProps {
 }
 
 export const PricingCard = ({ padding, background, borderRadius, highlighted, children }: PricingCardProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const elementRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
-      ref={(ref) => { if (ref) connect(drag(ref)); }}
+      ref={(ref) => {
+        elementRef.current = ref;
+        connectRef(ref);
+      }}
       style={{
         padding: `${padding}px`,
         backgroundColor: background,
@@ -21,15 +28,17 @@ export const PricingCard = ({ padding, background, borderRadius, highlighted, ch
         display: 'flex',
         flexDirection: 'column',
         border: '1px solid #e5e7eb',
+        position: 'relative',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        ...responsiveStyles,
       }}
       className={`shadow-md outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all min-h-[100px] ${highlighted ? 'ring-2 ring-blue-500' : ''}`}
     >
       {children}
+      {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
     </div>
   );
 };
-
-// ------ Settings Panel ------
 
 const PricingCardSettings = () => {
   const { actions: { setProp }, props } = useNode((node) => ({
@@ -53,7 +62,6 @@ const PricingCardSettings = () => {
           </label>
         </div>
       </div>
-
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Colors</h4>
         <label className="text-xs text-gray-600 flex items-center gap-2">
@@ -63,7 +71,6 @@ const PricingCardSettings = () => {
           <span className="text-xs text-gray-400 font-mono">{props.background}</span>
         </label>
       </div>
-
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Highlight</h4>
         <label className="text-xs text-gray-600 flex items-center gap-2">
@@ -78,16 +85,7 @@ const PricingCardSettings = () => {
 
 PricingCard.craft = {
   displayName: 'PricingCard',
-  props: {
-    padding: 32,
-    background: '#ffffff',
-    borderRadius: 12,
-    highlighted: false,
-  } as PricingCardProps,
-  related: {
-    settings: PricingCardSettings,
-  },
-  rules: {
-    canDrag: () => true,
-  },
+  props: { padding: 32, background: '#ffffff', borderRadius: 12, highlighted: false } as PricingCardProps,
+  related: { settings: PricingCardSettings },
+  rules: { canDrag: () => true },
 };

@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 
 interface CardComponentProps {
@@ -21,11 +24,15 @@ const shadowClasses: Record<string, string> = {
 export const CardComponent = ({
   padding, background, borderRadius, shadow, borderWidth, borderColor, children,
 }: CardComponentProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const elementRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
-      ref={(ref) => { if (ref) connect(drag(ref)); }}
+      ref={(ref) => {
+        elementRef.current = ref;
+        connectRef(ref);
+      }}
       style={{
         padding: `${padding}px`,
         backgroundColor: background,
@@ -33,10 +40,14 @@ export const CardComponent = ({
         borderWidth: `${borderWidth}px`,
         borderColor,
         borderStyle: 'solid',
+        position: 'relative',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        ...responsiveStyles,
       }}
       className={`min-h-[40px] outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all ${shadowClasses[shadow] || ''}`}
     >
       {children}
+      {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
     </div>
   );
 };

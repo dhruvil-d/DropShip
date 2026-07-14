@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 
 interface HeadingProps {
@@ -10,16 +13,44 @@ interface HeadingProps {
 }
 
 export const Heading = ({ text, level, fontSize, color, textAlign }: HeadingProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const { actions: { setProp } } = useNode();
+  const elementRef = useRef<HTMLHeadingElement>(null);
+  const startFontSizeRef = useRef(fontSize);
   const Tag = level;
 
   return (
     <Tag
-      ref={(ref: HTMLHeadingElement | null) => { if (ref) connect(drag(ref)); }}
-      style={{ fontSize: `${fontSize}px`, color, textAlign }}
+      ref={(ref: HTMLHeadingElement | null) => {
+        elementRef.current = ref;
+        connectRef(ref);
+      }}
+      style={{
+        fontSize: `${fontSize}px`,
+        color,
+        textAlign,
+        position: 'relative',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        ...responsiveStyles,
+      }}
       className="m-0 font-bold outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move"
     >
       {text}
+      {isSelected && <ResizeHandles 
+        nodeId={nodeId} 
+        targetRef={elementRef} 
+        onResizeStart={() => {
+          startFontSizeRef.current = fontSize;
+        }}
+        onResize={(w, _h, startW) => {
+          if (startW > 0 && w !== startW) {
+            const scale = w / startW;
+            setProp((p: HeadingProps) => {
+              p.fontSize = Math.max(8, Math.round(startFontSizeRef.current * scale));
+            });
+          }
+        }}
+      />}
     </Tag>
   );
 };

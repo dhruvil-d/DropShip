@@ -117,30 +117,42 @@ export const PreviewModal = ({ code, isOpen, onClose }: PreviewModalProps) => {
           )}
 
           {viewMode === 'sandpack' && (
-            <Sandpack
-              template="react-ts"
-              theme="light"
-              files={{
-                "/App.tsx": code,
-                "/index.html": `<!DOCTYPE html>
+            <div className="h-full sandpack-full-height">
+              <style>{`
+                .sandpack-full-height .sp-wrapper, 
+                .sandpack-full-height .sp-layout, 
+                .sandpack-full-height .sp-stack, 
+                .sandpack-full-height .sp-preview-container { 
+                  height: 100% !important; 
+                  min-height: 100% !important;
+                }
+              `}</style>
+              <Sandpack
+                template="react-ts"
+                theme="light"
+                files={{
+                  "/App.tsx": code,
+                  "/index.html": `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Preview</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      html, body, #root { height: 100%; margin: 0; background: white; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
   </body>
 </html>`
-              }}
+                }}
               options={{
                 showNavigator: true,
                 showTabs: true,
                 editorHeight: "100%",
-                wrapContent: true,
-                bundlerTimeoutMs: 30000,
+                bundlerTimeOut: 30000,
               }}
               customSetup={{
                 dependencies: {
@@ -148,6 +160,7 @@ export const PreviewModal = ({ code, isOpen, onClose }: PreviewModalProps) => {
                 }
               }}
             />
+          </div>
           )}
 
           {viewMode === 'code' && (

@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
+import { useResponsiveNode } from '../../hooks/useResponsiveNode';
+import { ResizeHandles } from '../editor/ResizeHandles';
 
 
 interface DividerComponentProps {
@@ -7,17 +10,24 @@ interface DividerComponentProps {
 }
 
 export const DividerComponent = ({ color, marginY }: DividerComponentProps) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const elementRef = useRef<HTMLHRElement>(null);
 
   return (
-    <hr
-      ref={(ref: HTMLHRElement | null) => { if (ref) connect(drag(ref)); }}
-      style={{
-        borderColor: color,
-        marginBlock: `${marginY}px`,
-      }}
-      className="border-0 border-t outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move"
-    />
+    <div style={{ position: 'relative', ...responsiveStyles, transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+      <hr
+        ref={(ref: HTMLHRElement | null) => {
+          elementRef.current = ref;
+          connectRef(ref);
+        }}
+        style={{
+          borderColor: color,
+          marginBlock: `${marginY}px`,
+        }}
+        className="border-0 border-t outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move"
+      />
+      {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
+    </div>
   );
 };
 
