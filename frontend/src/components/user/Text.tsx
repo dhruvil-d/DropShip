@@ -1,10 +1,12 @@
-import { useRef } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import { useNode } from '@craftjs/core';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
+import { RichTextToolbar } from '../editor/RichTextToolbar';
 
 
 interface TextProps {
+  /** HTML content string — may contain inline formatting spans */
   text: string;
   fontSize: number;
   fontWeight: string;
@@ -14,33 +16,131 @@ interface TextProps {
 }
 
 export const Text = ({ text, fontSize, fontWeight, color, textAlign, lineHeight }: TextProps) => {
-  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
-  const { actions: { setProp } } = useNode();
+  const { isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const { actions: { setProp }, connectors: { connect } } = useNode();
   const elementRef = useRef<HTMLParagraphElement>(null);
   const startFontSizeRef = useRef(fontSize);
 
+  // Track whether the content was changed internally (by user typing) to avoid
+  // the sync effect from overwriting the user's edits
+  const internalChangeRef = useRef(false);
+  // Keep a ref to the latest text value so the ref callback can read it without re-running
+  const latestTextRef = useRef(text);
+  latestTextRef.current = text;
+
+  // Sync the text prop to the element when it changes EXTERNALLY (e.g. from settings panel).
+  // When the user is typing (internalChangeRef is true), skip the sync.
+  useEffect(() => {
+    if (internalChangeRef.current) {
+      internalChangeRef.current = false;
+      return;
+    }
+    if (elementRef.current && elementRef.current.innerHTML !== text) {
+      elementRef.current.innerHTML = text;
+    }
+  }, [text]);
+
+  // Auto-focus when selected (optional, but nice for UX)
+  useEffect(() => {
+    if (isSelected && elementRef.current && document.activeElement !== elementRef.current) {
+      // We don't forcefully focus here because it might reset the caret position 
+      // if the user clicked a specific character. The browser handles focus on mousedown.
+    } else if (!isSelected) {
+      // Save content before exiting
+      if (elementRef.current) {
+        internalChangeRef.current = true;
+        setProp((p: TextProps) => {
+          p.text = elementRef.current!.innerHTML;
+        });
+      }
+    }
+  }, [isSelected]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /** Save innerHTML to the text prop on every input */
+  const handleInput = useCallback(() => {
+    if (elementRef.current) {
+      internalChangeRef.current = true;
+      const html = elementRef.current.innerHTML;
+      setProp((p: TextProps) => {
+        p.text = html;
+      }, 500); // 500ms throttle
+    }
+  }, [setProp]);
+
+  /** Prevent Craft.js from stealing mouse events while editing — allows normal text selection */
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    // Always stop propagation so parent containers don't initiate a drag
+    e.stopPropagation();
+  }, []);
+
+  /** Handle blur — save content */
+  const handleBlur = useCallback((e: React.FocusEvent) => {
+    // Don't save/exit if focus moved to the toolbar (portal)
+    const relatedTarget = e.relatedTarget as HTMLElement | null;
+    if (relatedTarget?.closest('.rich-text-toolbar')) {
+      return;
+    }
+    if (elementRef.current) {
+      internalChangeRef.current = true;
+      setProp((p: TextProps) => {
+        p.text = elementRef.current!.innerHTML;
+      });
+    }
+  }, [setProp]);
+
+  /** Handle key events */
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      elementRef.current?.blur();
+    }
+    // Always prevent Craft.js from interpreting keypresses as shortcuts while typing
+    e.stopPropagation();
+  }, []);
+
+  // Ref callback: connect to Craft.js for selection (NO drag), and set initial HTML content
+  const refCallback = useCallback(
+    (ref: HTMLParagraphElement | null) => {
+      elementRef.current = ref;
+      if (ref) {
+        connect(ref);
+        // Set initial content from prop (never use dangerouslySetInnerHTML)
+        if (ref.innerHTML !== latestTextRef.current) {
+          ref.innerHTML = latestTextRef.current;
+        }
+      }
+    },
+    [connect]
+  );
+
   return (
-    <p
-      ref={(ref) => {
-        elementRef.current = ref;
-        connectRef(ref);
-      }}
-      style={{
-        fontSize: `${fontSize}px`,
-        fontWeight,
-        color,
-        textAlign,
-        lineHeight,
-        position: 'relative',
-        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-        ...responsiveStyles,
-      }}
-      className="m-0 p-1 outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move"
-    >
-      {text}
-      {isSelected && <ResizeHandles 
-        nodeId={nodeId} 
-        targetRef={elementRef} 
+    <>
+      <p
+        ref={refCallback}
+        contentEditable={true}
+        suppressContentEditableWarning
+        onInput={handleInput}
+        onMouseDown={handleMouseDown}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
+        style={{
+          fontSize: `${fontSize}px`,
+          fontWeight,
+          color,
+          textAlign,
+          lineHeight,
+          position: 'relative',
+          transition: isSelected ? 'none' : 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+          ...responsiveStyles,
+        }}
+        className={`m-0 p-1 transition-all outline-transparent rich-text-editable ${
+          isSelected
+            ? 'rich-text-editing-ring cursor-text'
+            : 'hover:outline-blue-400 hover:outline-dashed hover:outline-2 cursor-text'
+        }`}
+      />
+      {isSelected && <ResizeHandles
+        nodeId={nodeId}
+        targetRef={elementRef}
         onResizeStart={() => {
           startFontSizeRef.current = fontSize;
         }}
@@ -53,7 +153,8 @@ export const Text = ({ text, fontSize, fontWeight, color, textAlign, lineHeight 
           }
         }}
       />}
-    </p>
+      <RichTextToolbar targetRef={elementRef} isEditing={isSelected} />
+    </>
   );
 };
 
@@ -69,17 +170,24 @@ const TextSettings = () => {
       {/* Content */}
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Content</h4>
+        <p className="text-[11px] text-gray-400 mb-2 italic">
+          Click the text on the canvas to edit. Select words to format them with the floating toolbar.
+        </p>
         <textarea
           value={props.text}
           onChange={(e) => setProp((p: TextProps) => { p.text = e.target.value; })}
           rows={3}
-          className="w-full px-2 py-1.5 border border-gray-200 rounded text-sm resize-y"
+          className="w-full px-2 py-1.5 border border-gray-200 rounded text-sm resize-y font-mono"
+          placeholder="HTML content…"
         />
       </div>
 
-      {/* Typography */}
+      {/* Block-level Typography (defaults) */}
       <div>
-        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Typography</h4>
+        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Block Defaults</h4>
+        <p className="text-[11px] text-gray-400 mb-2">
+          These apply to the entire text block. Use the floating toolbar for per-word formatting.
+        </p>
         <div className="grid grid-cols-2 gap-2">
           <label className="text-xs text-gray-600">
             Font Size
@@ -140,6 +248,6 @@ Text.craft = {
     settings: TextSettings,
   },
   rules: {
-    canDrag: () => true,
+    canDrag: () => false,
   },
 };

@@ -10,14 +10,18 @@ This document outlines the features and components that have been developed so f
 - **Editor Components:**
   - `Topbar`: Navigation and high-level actions (like previewing/exporting).
   - `Toolbox`: A registry-driven left sidebar with searchable, categorized palettes of draggable components.
-  - `SettingsPanel`: Right sidebar for editing properties of the currently selected component.
+  - `SettingsPanel`: Right sidebar for editing properties of the currently selected component. Now includes full CSS control (Design Controls) and Responsive Design controls (mobile, tablet, desktop breakpoints).
+  - `ResizeHandles`: On-canvas visual resizing for components.
   - `PreviewModal`: A modal to preview the generated page.
 - **User Components (Draggable Elements):**
-  - **Basic Elements:** `Button`, `Text`, `Heading`, `ImageComponent`, `DividerComponent`, `BadgeComponent`.
+  - **Basic Elements:** `Button`, `Text`, `Heading`, `ImageComponent`, `DividerComponent`, `BadgeComponent`, `AlertComponent`, `AvatarComponent`, `ListComponent`.
   - **Layout & Canvas:** `Container`, `CardComponent` (both support nesting other elements).
   - **Form Elements:** `InputComponent`, `TextareaComponent`, `SelectComponent`.
-  - **Composite Elements:** Pre-assembled blocks including `LoginForm`, `HeroSection`, and `ContactForm`.
-- **Styling:** Integrated with Tailwind CSS for rapid UI development and styling.
+  - **Composite Elements:** Pre-assembled blocks including `LoginForm`, `HeroSection`, `ContactForm`, `NewsletterSection`, `PricingCard`, and `TestimonialCard`.
+- **Styling & Responsive Design:**
+  - Integrated with Tailwind CSS for rapid UI development and styling.
+  - Extensive CSS options (`DesignControls`) supporting margins, borders, flexbox alignment, and typography settings.
+  - Multi-platform responsive metadata (`ResponsiveControls`) allowing styling overrides across mobile, tablet, and desktop breakpoints.
 
 ### Backend (Node.js + Express)
 - **Code Compilation API:** An Express server (`server.js`) with an `/api/compile` endpoint.
@@ -28,23 +32,19 @@ This document outlines the features and components that have been developed so f
 
 ## Things We Are Going to Make in the Future
 
-### 1. Advanced Styling & Properties
-- Enhance the `SettingsPanel` to support full CSS control (margins, borders, flexbox alignment, typography settings).
-- Responsive design controls (mobile, tablet, desktop breakpoints) for components.
-
-### 2. Data Persistence & User Accounts
+### 1. Data Persistence & User Accounts
 - Integrate a database (e.g., MongoDB, PostgreSQL, or Firebase) to save, load, and manage projects.
 - Implement user authentication (Sign up / Log in) so users can manage their own pages.
 
-### 3. Interactive Elements & State
+### 2. Interactive Elements & State
 - Add the ability to assign actions to buttons (e.g., linking to URLs, showing alerts).
 - Basic state management for the generated applications.
 
-### 4. Export and Deployment
+### 3. Export and Deployment
 - Download project as a complete ZIP file (React/Next.js boilerplate).
 - One-click deployment integration (e.g., Vercel, Netlify) to publish the generated JSX directly to the web.
 - Code preview window with real-time syntax highlighting for the generated React code.
 
-### 5. UI/UX Improvements
+### 4. UI/UX Improvements
 - A more premium and polished design aesthetic for the editor itself.
 - Undo/Redo functionality and history tracking (currently partially implemented via Craft.js but needs UI hooks).

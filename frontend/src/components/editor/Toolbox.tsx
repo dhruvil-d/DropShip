@@ -24,6 +24,8 @@ import { ListComponent } from '../user/ListComponent';
 import { PricingCard } from '../user/PricingCard';
 import { TestimonialCard } from '../user/TestimonialCard';
 import { NewsletterSection } from '../user/NewsletterSection';
+import { Table, TableRow, TableCell } from '../user/TableElements';
+import { Carousel } from '../user/CarouselComponent';
 
 const componentMap: Record<string, React.ComponentType<any>> = {
   Container,
@@ -46,19 +48,25 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   PricingCard,
   TestimonialCard,
   NewsletterSection,
+  Table,
+  TableRow,
+  TableCell,
+  Carousel,
 };
 
 // ------ Helpers to build default JSX elements for drag ------
 
-function buildDefaultElement(name: string): React.ReactElement | null {
+function buildDefaultElement(name: string, propsOverride: Record<string, any> = {}): React.ReactElement | null {
   const def = componentRegistry[name];
   const Component = componentMap[name];
   if (!def || !Component) return null;
 
   // Extract default props from the registry
-  const defaultProps: Record<string, unknown> = {};
+  const defaultProps: Record<string, unknown> = { ...propsOverride };
   for (const prop of def.props) {
-    defaultProps[prop.name] = prop.defaultValue;
+    if (defaultProps[prop.name] === undefined) {
+      defaultProps[prop.name] = prop.defaultValue;
+    }
   }
 
   // For canvas components (containers), wrap in <Element> so children can be dropped inside
@@ -66,14 +74,9 @@ function buildDefaultElement(name: string): React.ReactElement | null {
     // Build default children for composite components
     if (def.defaultChildren && def.defaultChildren.length > 0) {
       const children = def.defaultChildren.map((child, i) => {
-        const ChildComponent = componentMap[child.component];
-        if (!ChildComponent) return null;
-
-        const childDef = componentRegistry[child.component];
-        if (childDef && childDef.isCanvas) {
-          return <Element key={i} is={ChildComponent} canvas {...child.props} />;
-        }
-        return <ChildComponent key={i} {...child.props} />;
+        const childElement = buildDefaultElement(child.component, child.props);
+        if (!childElement) return null;
+        return React.cloneElement(childElement, { key: i });
       }).filter(Boolean);
 
       return <Element is={Component} canvas {...defaultProps}>{children}</Element>;
@@ -82,7 +85,14 @@ function buildDefaultElement(name: string): React.ReactElement | null {
     return <Element is={Component} canvas {...defaultProps} />;
   }
 
-  return <Component {...defaultProps} />;
+  // Wrap every leaf (non-canvas) component in its own Container
+  // so each component has an independently-styleable box
+  return (
+    <Element is={Container} canvas padding={0} margin={0} gap={0}
+      flexDirection="column" background="transparent" borderRadius={0} shadow="none" minHeight={0}>
+      <Element is={Component} {...defaultProps} />
+    </Element>
+  );
 }
 
 // ------ Category icon colors ------

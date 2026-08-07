@@ -199,6 +199,142 @@ function buildListChildren(nodeProps) {
   });
 }
 
+// Table builder removed since Table is now composable
+
+function buildCarouselChildren(props) {
+  const children = [];
+  const imagesProp = props.images;
+  let images = [];
+  try {
+    images = typeof imagesProp === 'string' ? JSON.parse(imagesProp) : (Array.isArray(imagesProp) ? imagesProp : []);
+  } catch(e) {}
+
+  const objectFit = props.objectFit || 'fill';
+  const showDots = props.showDots !== false;
+  
+  if (images.length === 0) return children;
+
+  // The carousel is output as a CSS scroll-snap container so it functions without JS.
+  const containerStyle = t.objectExpression([
+    t.objectProperty(t.identifier('display'), t.stringLiteral('flex')),
+    t.objectProperty(t.identifier('overflowX'), t.stringLiteral('auto')),
+    t.objectProperty(t.identifier('scrollSnapType'), t.stringLiteral('x mandatory')),
+    t.objectProperty(t.identifier('scrollBehavior'), t.stringLiteral('smooth')),
+    t.objectProperty(t.identifier('height'), t.stringLiteral('100%')),
+    t.objectProperty(t.identifier('width'), t.stringLiteral('100%')),
+    t.objectProperty(t.identifier('scrollbarWidth'), t.stringLiteral('none')) // Hide scrollbar in firefox
+  ]);
+
+  const slideStyle = t.objectExpression([
+    t.objectProperty(t.identifier('flex'), t.stringLiteral('0 0 100%')),
+    t.objectProperty(t.identifier('scrollSnapAlign'), t.stringLiteral('start')),
+    t.objectProperty(t.identifier('width'), t.stringLiteral('100%')),
+    t.objectProperty(t.identifier('height'), t.stringLiteral('100%'))
+  ]);
+
+  const imgStyle = t.objectExpression([
+    t.objectProperty(t.identifier('width'), t.stringLiteral('100%')),
+    t.objectProperty(t.identifier('height'), t.stringLiteral('100%')),
+    t.objectProperty(t.identifier('objectFit'), t.stringLiteral(objectFit))
+  ]);
+
+  const slides = images.map((img, idx) => {
+    return t.jsxElement(
+      t.jsxOpeningElement(t.jsxIdentifier('div'), [
+        t.jsxAttribute(t.jsxIdentifier('id'), t.stringLiteral(`carousel-slide-${img.id || idx}`)),
+        t.jsxAttribute(t.jsxIdentifier('style'), t.jsxExpressionContainer(slideStyle))
+      ]),
+      t.jsxClosingElement(t.jsxIdentifier('div')),
+      [
+        t.jsxElement(
+          t.jsxOpeningElement(t.jsxIdentifier('img'), [
+            t.jsxAttribute(t.jsxIdentifier('src'), t.stringLiteral(img.url)),
+            t.jsxAttribute(t.jsxIdentifier('alt'), t.stringLiteral(img.alt || '')),
+            t.jsxAttribute(t.jsxIdentifier('style'), t.jsxExpressionContainer(imgStyle))
+          ], true),
+          null,
+          [],
+          true
+        )
+      ]
+    );
+  });
+
+  const track = t.jsxElement(
+    t.jsxOpeningElement(t.jsxIdentifier('div'), [
+      t.jsxAttribute(t.jsxIdentifier('style'), t.jsxExpressionContainer(containerStyle)),
+      t.jsxAttribute(t.jsxIdentifier('className'), t.stringLiteral('hide-scrollbar'))
+    ]),
+    t.jsxClosingElement(t.jsxIdentifier('div')),
+    slides
+  );
+  
+  children.push(track);
+
+  // Dots
+  if (showDots && images.length > 1) {
+    const dotsContainerStyle = t.objectExpression([
+      t.objectProperty(t.identifier('position'), t.stringLiteral('absolute')),
+      t.objectProperty(t.identifier('bottom'), t.stringLiteral('12px')),
+      t.objectProperty(t.identifier('left'), t.stringLiteral('50%')),
+      t.objectProperty(t.identifier('transform'), t.stringLiteral('translateX(-50%)')),
+      t.objectProperty(t.identifier('display'), t.stringLiteral('flex')),
+      t.objectProperty(t.identifier('gap'), t.stringLiteral('6px'))
+    ]);
+
+    const dotElements = images.map((img, idx) => {
+      const dotStyle = t.objectExpression([
+        t.objectProperty(t.identifier('width'), t.stringLiteral('8px')),
+        t.objectProperty(t.identifier('height'), t.stringLiteral('8px')),
+        t.objectProperty(t.identifier('borderRadius'), t.stringLiteral('50%')),
+        t.objectProperty(t.identifier('backgroundColor'), t.stringLiteral('rgba(255,255,255,0.7)'))
+      ]);
+
+      return t.jsxElement(
+        t.jsxOpeningElement(t.jsxIdentifier('a'), [
+          t.jsxAttribute(t.jsxIdentifier('href'), t.stringLiteral(`#carousel-slide-${img.id || idx}`)),
+          t.jsxAttribute(t.jsxIdentifier('style'), t.jsxExpressionContainer(dotStyle))
+        ]),
+        t.jsxClosingElement(t.jsxIdentifier('a')),
+        []
+      );
+    });
+
+    const dotsWrapper = t.jsxElement(
+      t.jsxOpeningElement(t.jsxIdentifier('div'), [
+        t.jsxAttribute(t.jsxIdentifier('style'), t.jsxExpressionContainer(dotsContainerStyle))
+      ]),
+      t.jsxClosingElement(t.jsxIdentifier('div')),
+      dotElements
+    );
+    children.push(dotsWrapper);
+  }
+
+  // Add global style for hiding scrollbar if it doesn't exist
+  children.push(
+    t.jsxElement(
+      t.jsxOpeningElement(t.jsxIdentifier('style'), [
+        t.jsxAttribute(
+          t.jsxIdentifier('dangerouslySetInnerHTML'),
+          t.jsxExpressionContainer(
+            t.objectExpression([
+              t.objectProperty(
+                t.identifier('__html'),
+                t.stringLiteral('.hide-scrollbar::-webkit-scrollbar { display: none; }')
+              )
+            ])
+          )
+        )
+      ], true),
+      null,
+      [],
+      true
+    )
+  );
+
+  return children;
+}
+
 /**
  * Recursively generate a JSX AST node from a Craft.js serialized node.
  */
@@ -234,14 +370,44 @@ function generateJSX(nodes, nodeId) {
     }
 
     if (behavior.type === 'content') {
-      children.push(t.jsxText(String(value)));
+      const textValue = String(value);
+      const hasHTML = /<[a-z][\s\S]*>/i.test(textValue);
+
+      if (def.richText && hasHTML) {
+        // Rich text: output dangerouslySetInnerHTML={{ __html: "..." }}
+        jsxProps.push(
+          t.jsxAttribute(
+            t.jsxIdentifier('dangerouslySetInnerHTML'),
+            t.jsxExpressionContainer(
+              t.objectExpression([
+                t.objectProperty(
+                  t.identifier('__html'),
+                  t.stringLiteral(textValue)
+                )
+              ])
+            )
+          )
+        );
+      } else {
+        // Plain text: output as JSX text child
+        children.push(t.jsxText(textValue));
+      }
       continue;
     }
 
     if (behavior.type === 'style') {
+      let finalValue = value;
+      // Special case: TableCell borders
+      if (typeName === 'TableCell' && behavior.cssProp === 'borderWidth') {
+        continue; // Handled below
+      }
+      if (typeName === 'TableCell' && behavior.cssProp === 'borderColor') {
+        continue; // Handled below
+      }
+
       styleEntries.push({
         cssProp: behavior.cssProp,
-        value,
+        value: finalValue,
         suffix: behavior.suffix || '',
       });
       continue;
@@ -264,6 +430,17 @@ function generateJSX(nodes, nodeId) {
     if (behavior.type === 'className') {
       continue;
     }
+  }
+
+  // TableCell specific styling combining borderWidth and borderColor
+  if (typeName === 'TableCell' && node.props) {
+    const width = node.props.borderWidth !== undefined ? node.props.borderWidth : 1;
+    const color = node.props.borderColor || '#e5e7eb';
+    styleEntries.push({
+      cssProp: 'border',
+      value: `${width}px solid ${color}`,
+      suffix: ''
+    });
   }
 
   // ---------- Build className from baseClasses + variantClasses + booleanClasses ----------
@@ -325,6 +502,29 @@ function generateJSX(nodes, nodeId) {
   if (def.isList) {
     const listChildren = buildListChildren(node.props || {});
     children.push(...listChildren);
+  }
+
+  if (def.isCarousel) {
+    const carouselChildren = buildCarouselChildren(node.props || {});
+    children.push(...carouselChildren);
+  }
+
+  // If table is responsive, wrap it in overflow-x-auto
+  if (typeName === 'Table' && node.props && node.props.responsive !== false) {
+    const wrapper = t.jsxElement(
+      t.jsxOpeningElement(t.jsxIdentifier('div'), [
+        t.jsxAttribute(t.jsxIdentifier('className'), t.stringLiteral('overflow-x-auto max-w-full w-full'))
+      ]),
+      t.jsxClosingElement(t.jsxIdentifier('div')),
+      [
+        t.jsxElement(
+          t.jsxOpeningElement(t.jsxIdentifier(tagName), jsxProps),
+          t.jsxClosingElement(t.jsxIdentifier(tagName)),
+          children
+        )
+      ]
+    );
+    return wrapper;
   }
 
   // ---------- Process Craft.js child nodes ----------

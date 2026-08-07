@@ -25,6 +25,8 @@ import { ListComponent } from './components/user/ListComponent';
 import { PricingCard } from './components/user/PricingCard';
 import { TestimonialCard } from './components/user/TestimonialCard';
 import { NewsletterSection } from './components/user/NewsletterSection';
+import { Table, TableRow, TableCell } from './components/user/TableElements';
+import { Carousel } from './components/user/CarouselComponent';
 
 // Dynamic resolver — maps component displayName to the actual React component.
 // When you add a new component, add it here AND in the component-registry.
@@ -49,6 +51,10 @@ const resolver = {
   PricingCard,
   TestimonialCard,
   NewsletterSection,
+  Table,
+  TableRow,
+  TableCell,
+  Carousel,
 };
 
 function App() {
@@ -89,13 +95,25 @@ function App() {
             >
               <Frame>
                 <Element is={Container} padding={40} margin={0} gap={12} flexDirection="column" background="#ffffff" borderRadius={0} shadow="none" minHeight="100vh" canvas>
-                  <Heading text="Welcome to DropShip" level="h1" fontSize={32} color="#111827" textAlign="left" />
-                  <Text text="Drag components from the left sidebar to start building your application. Try composite components like LoginForm or HeroSection for pre-built layouts." fontSize={16} fontWeight="400" color="#6b7280" textAlign="left" lineHeight={1.6} />
-                  <DividerComponent color="#e5e7eb" marginY={16} />
+                  <Element is={Container} padding={0} margin={0} gap={0} flexDirection="column" background="transparent" borderRadius={0} shadow="none" minHeight={0} canvas>
+                    <Heading text="Welcome to DropShip" level="h1" fontSize={32} color="#111827" textAlign="left" />
+                  </Element>
+                  <Element is={Container} padding={0} margin={0} gap={0} flexDirection="column" background="transparent" borderRadius={0} shadow="none" minHeight={0} canvas>
+                    <Text text="Drag components from the left sidebar to start building your application. Try composite components like LoginForm or HeroSection for pre-built layouts." fontSize={16} fontWeight="400" color="#6b7280" textAlign="left" lineHeight={1.6} />
+                  </Element>
+                  <Element is={Container} padding={0} margin={0} gap={0} flexDirection="column" background="transparent" borderRadius={0} shadow="none" minHeight={0} canvas>
+                    <DividerComponent color="#e5e7eb" marginY={16} />
+                  </Element>
                   <Element is={Container} padding={20} margin={0} background="#f9fafb" borderRadius={8} gap={12} flexDirection="row" shadow="none" minHeight={50} canvas>
-                    <Button text="Get Started" variant="primary" size="md" disabled={false} fullWidth={false} />
-                    <Button text="Learn More" variant="outline" size="md" disabled={false} fullWidth={false} />
-                    <BadgeComponent text="New" variant="success" />
+                    <Element is={Container} padding={0} margin={0} gap={0} flexDirection="column" background="transparent" borderRadius={0} shadow="none" minHeight={0} canvas>
+                      <Button text="Get Started" variant="primary" size="md" disabled={false} fullWidth={false} />
+                    </Element>
+                    <Element is={Container} padding={0} margin={0} gap={0} flexDirection="column" background="transparent" borderRadius={0} shadow="none" minHeight={0} canvas>
+                      <Button text="Learn More" variant="outline" size="md" disabled={false} fullWidth={false} />
+                    </Element>
+                    <Element is={Container} padding={0} margin={0} gap={0} flexDirection="column" background="transparent" borderRadius={0} shadow="none" minHeight={0} canvas>
+                      <BadgeComponent text="New" variant="success" />
+                    </Element>
                   </Element>
                 </Element>
               </Frame>

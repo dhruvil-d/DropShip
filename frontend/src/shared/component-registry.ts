@@ -14,6 +14,7 @@ import {
   TextCursorInput, AlignLeft, ListOrdered, RectangleHorizontal,
   Tag, Minus, LogIn, Sparkles, Mail,
   AlertCircle, CircleUserRound, List, CreditCard, Quote, Newspaper,
+  Table as TableIcon, Images,
 } from 'lucide-react';
 
 // ------ Type Definitions ------
@@ -37,7 +38,7 @@ export interface PropDefinition {
   /** Control type for the settings panel */
   control: 'text' | 'number' | 'select' | 'color' | 'boolean' | 'textarea';
   /** Default value */
-  defaultValue: string | number | boolean;
+  defaultValue: string | number | boolean | any[];
   /** For 'select' control: the available options */
   options?: Array<{ label: string; value: string }>;
   /** How this prop compiles to JSX */
@@ -70,6 +71,8 @@ export interface ComponentDefinition {
   props: PropDefinition[];
   /** Variant prop name → { variantValue → tailwind classes } */
   variantClasses?: Record<string, Record<string, string>>;
+  /** Whether this component should be hidden from the Toolbox */
+  hidden?: boolean;
   /** Whether this component can contain children (Craft.js canvas) */
   isCanvas: boolean;
   /** For composite components: pre-built children tree */
@@ -434,6 +437,134 @@ export const componentRegistry: Record<string, ComponentDefinition> = {
   },
 
   // ==================== DATA DISPLAY ====================
+
+  Table: {
+    name: 'Table',
+    category: 'Data Display',
+    icon: TableIcon,
+    description: 'Customizable Grid Table',
+    tagName: 'table',
+    baseClasses: 'w-full border-collapse',
+    isCanvas: true,
+    defaultChildren: [
+      { component: 'TableRow', props: {} },
+      { component: 'TableRow', props: {} },
+      { component: 'TableRow', props: {} },
+    ],
+    props: [
+      {
+        name: 'responsive', label: 'Responsive', control: 'boolean', defaultValue: true,
+        behavior: { type: 'skip' }, group: 'Layout',
+      },
+    ],
+  },
+
+  TableRow: {
+    name: 'TableRow',
+    category: 'Data Display',
+    icon: TableIcon,
+    description: 'Table Row',
+    tagName: 'tr',
+    baseClasses: '',
+    isCanvas: true,
+    hidden: true,
+    defaultChildren: [
+      { component: 'TableCell', props: {} },
+      { component: 'TableCell', props: {} },
+      { component: 'TableCell', props: {} },
+    ],
+    props: [],
+  },
+
+  TableCell: {
+    name: 'TableCell',
+    category: 'Data Display',
+    icon: TableIcon,
+    description: 'Table Cell',
+    tagName: 'td',
+    baseClasses: '',
+    isCanvas: true,
+    hidden: true,
+    defaultChildren: [
+      { component: 'Text', props: { text: 'Placeholder' } },
+    ],
+    props: [
+      {
+        name: 'padding', label: 'Padding', control: 'number', defaultValue: 12,
+        behavior: { type: 'style', cssProp: 'padding', suffix: 'px' }, group: 'Style',
+      },
+      {
+        name: 'backgroundColor', label: 'Background', control: 'color', defaultValue: 'transparent',
+        behavior: { type: 'style', cssProp: 'backgroundColor' }, group: 'Style',
+      },
+      {
+        name: 'borderWidth', label: 'Border Width', control: 'number', defaultValue: 1,
+        behavior: { type: 'skip' }, group: 'Style',
+      },
+      {
+        name: 'borderColor', label: 'Border Color', control: 'color', defaultValue: '#e5e7eb',
+        behavior: { type: 'skip' }, group: 'Style', // Handled custom on backend to combine width + color
+      },
+      {
+        name: 'textAlign', label: 'Text Align', control: 'select', defaultValue: 'left',
+        options: [
+          { label: 'Left', value: 'left' },
+          { label: 'Center', value: 'center' },
+          { label: 'Right', value: 'right' },
+        ],
+        behavior: { type: 'style', cssProp: 'textAlign' }, group: 'Style',
+      },
+    ],
+  },
+
+  Carousel: {
+    name: 'Carousel',
+    category: 'Data Display',
+    icon: Images,
+    description: 'Image slider/carousel',
+    tagName: 'div',
+    baseClasses: 'relative w-full overflow-hidden flex',
+    isCanvas: false,
+    props: [
+      {
+        name: 'images', label: 'Images', control: 'textarea',
+        defaultValue: [
+          { id: '1', url: 'https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?auto=format&fit=crop&w=800&q=80', alt: 'Slide 1' },
+          { id: '2', url: 'https://images.unsplash.com/photo-1707343843437-caacff5cfa74?auto=format&fit=crop&w=800&q=80', alt: 'Slide 2' },
+        ],
+        behavior: { type: 'skip' }, group: 'Content', // Handled by custom editor panel
+      },
+      {
+        name: 'autoPlay', label: 'Auto-play', control: 'boolean', defaultValue: true,
+        behavior: { type: 'skip' }, group: 'Behavior',
+      },
+      {
+        name: 'interval', label: 'Interval (ms)', control: 'number', defaultValue: 3000,
+        behavior: { type: 'skip' }, group: 'Behavior',
+      },
+      {
+        name: 'showArrows', label: 'Show Arrows', control: 'boolean', defaultValue: true,
+        behavior: { type: 'skip' }, group: 'Behavior',
+      },
+      {
+        name: 'showDots', label: 'Show Dots', control: 'boolean', defaultValue: true,
+        behavior: { type: 'skip' }, group: 'Behavior',
+      },
+      {
+        name: 'height', label: 'Height (px)', control: 'number', defaultValue: 400,
+        behavior: { type: 'style', cssProp: 'height', suffix: 'px' }, group: 'Layout',
+      },
+      {
+        name: 'objectFit', label: 'Image Fit', control: 'select', defaultValue: 'fill',
+        options: [
+          { label: 'Cover', value: 'cover' },
+          { label: 'Contain', value: 'contain' },
+          { label: 'Fill', value: 'fill' },
+        ],
+        behavior: { type: 'skip' }, group: 'Layout',
+      },
+    ],
+  },
 
   CardComponent: {
     name: 'CardComponent',
@@ -868,6 +999,7 @@ export function getComponentsByCategory(): Array<{ category: string; components:
   const categoryOrder = ['Layout', 'Basic', 'Forms', 'Data Display', 'Composite'];
 
   for (const def of Object.values(componentRegistry)) {
+    if (def.hidden) continue;
     const list = categoryMap.get(def.category) || [];
     list.push(def);
     categoryMap.set(def.category, list);

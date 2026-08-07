@@ -39,6 +39,7 @@ const registry = {
     tagName: 'p',
     baseClasses: 'm-0',
     selfClosing: false,
+    richText: true, // text prop may contain inline HTML formatting
     propBehaviors: {
       text:       { type: 'content' },
       fontSize:   { type: 'style', cssProp: 'fontSize', suffix: 'px' },
@@ -54,6 +55,7 @@ const registry = {
     tagName: 'h2', // overridden by `level` prop
     baseClasses: 'm-0 font-bold',
     selfClosing: false,
+    richText: true, // text prop may contain inline HTML formatting
     dynamicTag: 'level', // prop name that overrides tagName
     propBehaviors: {
       text:      { type: 'content' },
@@ -164,6 +166,55 @@ const registry = {
   },
 
   // ==================== DATA DISPLAY ====================
+
+  Table: {
+    tagName: 'table',
+    baseClasses: 'w-full border-collapse',
+    selfClosing: false,
+    propBehaviors: {
+      responsive: { type: 'skip' },
+    },
+    variantClasses: {},
+  },
+
+  TableRow: {
+    tagName: 'tr',
+    baseClasses: '',
+    selfClosing: false,
+    propBehaviors: {},
+    variantClasses: {},
+  },
+
+  TableCell: {
+    tagName: 'td',
+    baseClasses: '',
+    selfClosing: false,
+    propBehaviors: {
+      padding:         { type: 'style', cssProp: 'padding', suffix: 'px' },
+      backgroundColor: { type: 'style', cssProp: 'backgroundColor' },
+      borderWidth:     { type: 'skip' }, // Handled in combined border rule
+      borderColor:     { type: 'skip' }, // Handled in combined border rule
+      textAlign:       { type: 'style', cssProp: 'textAlign' },
+    },
+    variantClasses: {},
+  },
+
+  Carousel: {
+    tagName: 'div',
+    baseClasses: 'relative w-full overflow-hidden flex',
+    selfClosing: false,
+    isCarousel: true, // Custom flag for server.js to generate slides
+    propBehaviors: {
+      images:     { type: 'skip' },
+      autoPlay:   { type: 'skip' },
+      interval:   { type: 'skip' },
+      showArrows: { type: 'skip' },
+      showDots:   { type: 'skip' },
+      height:     { type: 'style', cssProp: 'height', suffix: 'px' },
+      objectFit:  { type: 'skip' },
+    },
+    variantClasses: {},
+  },
 
   CardComponent: {
     tagName: 'div',
