@@ -1,16 +1,16 @@
 import { useRef } from 'react';
-import { useNode } from '@craftjs/core';
+import { Element, useNode } from '@craftjs/core';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
+import { Text } from './Text';
 
 
 interface SelectComponentProps {
-  label: string;
   options: string; // comma-separated
   required: boolean;
 }
 
-export const SelectComponent = ({ label, options, required }: SelectComponentProps) => {
+export const SelectComponent = ({ options, required }: SelectComponentProps) => {
   const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLDivElement>(null);
   const optionList = options.split(',').map(s => s.trim()).filter(Boolean);
@@ -24,12 +24,10 @@ export const SelectComponent = ({ label, options, required }: SelectComponentPro
       className="flex flex-col gap-1 outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move"
       style={{ position: 'relative', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', ...responsiveStyles }}
     >
-      {label && (
-        <label className="text-sm font-medium text-gray-700">
-          {label}
-          {required && <span className="text-red-500 ml-0.5">*</span>}
-        </label>
-      )}
+      <label className="text-sm font-medium text-gray-700 flex items-center">
+        <Element id="select-label" is={Text} text="Select" fontSize={14} fontWeight="500" color="inherit" textAlign="left" lineHeight={1.5} />
+        {required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
       <select
         required={required}
         className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -55,11 +53,6 @@ const SelectSettings = () => {
     <div className="flex flex-col gap-4">
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Content</h4>
-        <label className="text-xs text-gray-600">
-          Label
-          <input type="text" value={props.label} onChange={(e) => setProp((p: SelectComponentProps) => { p.label = e.target.value; })}
-            className="w-full mt-1 px-2 py-1 border border-gray-200 rounded text-sm" />
-        </label>
         <label className="text-xs text-gray-600 mt-2 block">
           Options (comma-separated)
           <input type="text" value={props.options} onChange={(e) => setProp((p: SelectComponentProps) => { p.options = e.target.value; })}
@@ -82,7 +75,6 @@ const SelectSettings = () => {
 SelectComponent.craft = {
   displayName: 'SelectComponent',
   props: {
-    label: 'Select',
     options: 'Option 1,Option 2,Option 3',
     required: false,
   } as SelectComponentProps,

@@ -1,12 +1,11 @@
 import { useRef } from 'react';
-import { useNode } from '@craftjs/core';
+import { Element, useNode } from '@craftjs/core';
 import { AlertCircle, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
+import { Text } from './Text';
 
 interface AlertComponentProps {
-  title: string;
-  message: string;
   variant: 'info' | 'success' | 'warning' | 'error';
   dismissible: boolean;
 }
@@ -18,7 +17,7 @@ const variantConfig: Record<string, { bg: string; border: string; text: string; 
   error:   { bg: 'bg-red-50',     border: 'border-red-200',    text: 'text-red-800',    icon: XCircle },
 };
 
-export const AlertComponent = ({ title, message, variant }: AlertComponentProps) => {
+export const AlertComponent = ({ variant }: AlertComponentProps) => {
   const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLDivElement>(null);
   const config = variantConfig[variant] || variantConfig.info;
@@ -35,8 +34,10 @@ export const AlertComponent = ({ title, message, variant }: AlertComponentProps)
     >
       <Icon size={20} className="mt-0.5 flex-shrink-0" />
       <div>
-        {title && <strong className="block font-semibold mb-1">{title}</strong>}
-        {message && <span className="text-sm">{message}</span>}
+        <Element id="alert-title" is={Text} text="Heads up!" fontSize={16} fontWeight="600" color="inherit" textAlign="left" lineHeight={1.5} />
+        <div className="mt-1">
+          <Element id="alert-desc" is={Text} text="This is an informational alert message." fontSize={14} fontWeight="400" color="inherit" textAlign="left" lineHeight={1.5} />
+        </div>
       </div>
       {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
     </div>
@@ -52,20 +53,6 @@ const AlertSettings = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Content</h4>
-        <label className="text-xs text-gray-600">
-          Title
-          <input type="text" value={props.title} onChange={(e) => setProp((p: AlertComponentProps) => { p.title = e.target.value; })}
-            className="w-full mt-1 px-2 py-1 border border-gray-200 rounded text-sm" />
-        </label>
-        <label className="text-xs text-gray-600 mt-2 block">
-          Message
-          <textarea value={props.message} onChange={(e) => setProp((p: AlertComponentProps) => { p.message = e.target.value; })}
-            className="w-full mt-1 px-2 py-1 border border-gray-200 rounded text-sm" rows={3} />
-        </label>
-      </div>
-
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Style</h4>
         <label className="text-xs text-gray-600">
@@ -86,8 +73,6 @@ const AlertSettings = () => {
 AlertComponent.craft = {
   displayName: 'AlertComponent',
   props: {
-    title: 'Heads up!',
-    message: 'This is an informational alert message.',
     variant: 'info',
     dismissible: false,
   } as AlertComponentProps,

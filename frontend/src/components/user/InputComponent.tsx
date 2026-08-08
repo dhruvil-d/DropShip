@@ -1,17 +1,16 @@
 import { useRef } from 'react';
-import { useNode } from '@craftjs/core';
+import { Element, useNode } from '@craftjs/core';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
-
+import { Text } from './Text';
 
 interface InputComponentProps {
-  label: string;
   placeholder: string;
   type: 'text' | 'email' | 'password' | 'number';
   required: boolean;
 }
 
-export const InputComponent = ({ label, placeholder, type, required }: InputComponentProps) => {
+export const InputComponent = ({ placeholder, type, required }: InputComponentProps) => {
   const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLDivElement>(null);
 
@@ -24,12 +23,10 @@ export const InputComponent = ({ label, placeholder, type, required }: InputComp
       className="flex flex-col gap-1 outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move"
       style={{ position: 'relative', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', ...responsiveStyles }}
     >
-      {label && (
-        <label className="text-sm font-medium text-gray-700">
-          {label}
-          {required && <span className="text-red-500 ml-0.5">*</span>}
-        </label>
-      )}
+      <label className="text-sm font-medium text-gray-700 flex items-center">
+        <Element id="input-label" is={Text} text="Label" fontSize={14} fontWeight="500" color="inherit" textAlign="left" lineHeight={1.5} />
+        {required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
       <input
         type={type}
         placeholder={placeholder}
@@ -53,11 +50,6 @@ const InputSettings = () => {
     <div className="flex flex-col gap-4">
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Content</h4>
-        <label className="text-xs text-gray-600">
-          Label
-          <input type="text" value={props.label} onChange={(e) => setProp((p: InputComponentProps) => { p.label = e.target.value; })}
-            className="w-full mt-1 px-2 py-1 border border-gray-200 rounded text-sm" />
-        </label>
         <label className="text-xs text-gray-600 mt-2 block">
           Placeholder
           <input type="text" value={props.placeholder} onChange={(e) => setProp((p: InputComponentProps) => { p.placeholder = e.target.value; })}
@@ -90,7 +82,6 @@ const InputSettings = () => {
 InputComponent.craft = {
   displayName: 'InputComponent',
   props: {
-    label: 'Label',
     placeholder: 'Enter text...',
     type: 'text',
     required: false,

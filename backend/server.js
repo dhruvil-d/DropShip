@@ -55,19 +55,7 @@ function buildFormFieldChildren(def, nodeProps) {
     ? nodeProps.label.toLowerCase().replace(/[^a-z0-9]/g, '-') 
     : 'field';
 
-  // Label
-  if (nodeProps.label) {
-    const labelEl = t.jsxElement(
-      t.jsxOpeningElement(t.jsxIdentifier('label'), [
-        t.jsxAttribute(t.jsxIdentifier('htmlFor'), t.stringLiteral(fieldName)),
-        t.jsxAttribute(t.jsxIdentifier('className'), t.stringLiteral(labelClasses)),
-      ], false),
-      t.jsxClosingElement(t.jsxIdentifier('label')),
-      [t.jsxText(nodeProps.label)],
-      false
-    );
-    children.push(labelEl);
-  }
+  // Label is now handled via linkedNodes in Craft.js
 
   // Build field attributes
   const fieldAttrs = [
@@ -130,38 +118,7 @@ function buildFormFieldChildren(def, nodeProps) {
   return children;
 }
 
-/**
- * Build Alert children (title + message) for AlertComponent.
- */
-function buildAlertChildren(nodeProps) {
-  const children = [];
 
-  if (nodeProps.title) {
-    const titleEl = t.jsxElement(
-      t.jsxOpeningElement(t.jsxIdentifier('strong'), [
-        t.jsxAttribute(t.jsxIdentifier('className'), t.stringLiteral('block font-semibold mb-1')),
-      ], false),
-      t.jsxClosingElement(t.jsxIdentifier('strong')),
-      [t.jsxText(nodeProps.title)],
-      false
-    );
-    children.push(titleEl);
-  }
-
-  if (nodeProps.message) {
-    const msgEl = t.jsxElement(
-      t.jsxOpeningElement(t.jsxIdentifier('span'), [
-        t.jsxAttribute(t.jsxIdentifier('className'), t.stringLiteral('text-sm')),
-      ], false),
-      t.jsxClosingElement(t.jsxIdentifier('span')),
-      [t.jsxText(nodeProps.message)],
-      false
-    );
-    children.push(msgEl);
-  }
-
-  return children;
-}
 
 /**
  * Build Avatar children — either an <img> or a fallback <span>.
@@ -482,6 +439,24 @@ function generateJSX(nodes, nodeId) {
     jsxProps.push(styleAttr);
   }
 
+  // ---------- Process Craft.js child nodes ----------
+
+  if (node.nodes && node.nodes.length > 0) {
+    node.nodes.forEach(childId => {
+      const childJSX = generateJSX(nodes, childId);
+      if (childJSX) children.push(childJSX);
+    });
+  }
+
+  // Also check linkedNodes (used by some Craft.js canvas components)
+  // We process linkedNodes BEFORE form fields so labels appear above inputs
+  if (node.linkedNodes) {
+    for (const linkedId of Object.values(node.linkedNodes)) {
+      const linkedJSX = generateJSX(nodes, linkedId);
+      if (linkedJSX) children.push(linkedJSX);
+    }
+  }
+
   // ---------- Handle special component types ----------
 
   if (def.isFormField) {
@@ -490,8 +465,7 @@ function generateJSX(nodes, nodeId) {
   }
 
   if (def.isAlert) {
-    const alertChildren = buildAlertChildren(node.props || {});
-    children.push(...alertChildren);
+    // Alert children are now handled via linkedNodes
   }
 
   if (def.isAvatar) {
@@ -527,22 +501,7 @@ function generateJSX(nodes, nodeId) {
     return wrapper;
   }
 
-  // ---------- Process Craft.js child nodes ----------
 
-  if (node.nodes && node.nodes.length > 0) {
-    node.nodes.forEach(childId => {
-      const childJSX = generateJSX(nodes, childId);
-      if (childJSX) children.push(childJSX);
-    });
-  }
-
-  // Also check linkedNodes (used by some Craft.js canvas components)
-  if (node.linkedNodes) {
-    for (const linkedId of Object.values(node.linkedNodes)) {
-      const linkedJSX = generateJSX(nodes, linkedId);
-      if (linkedJSX) children.push(linkedJSX);
-    }
-  }
 
   // ---------- Build JSX element ----------
 

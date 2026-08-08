@@ -1,11 +1,10 @@
 import { useRef } from 'react';
-import { useNode } from '@craftjs/core';
+import { Element, useNode } from '@craftjs/core';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
-
+import { Text } from './Text';
 
 interface ButtonProps {
-  text: string;
   variant: 'primary' | 'secondary' | 'outline';
   size: 'sm' | 'md' | 'lg';
   disabled: boolean;
@@ -24,7 +23,7 @@ const sizeClasses: Record<string, string> = {
   lg: 'px-6 py-3 text-lg',
 };
 
-export const Button = ({ text, variant, size, disabled, fullWidth }: ButtonProps) => {
+export const Button = ({ variant, size, disabled, fullWidth }: ButtonProps) => {
   const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLButtonElement>(null);
 
@@ -51,7 +50,7 @@ export const Button = ({ text, variant, size, disabled, fullWidth }: ButtonProps
         ...responsiveStyles,
       }}
     >
-      {text}
+      <Element id="button-text" is={Text} text="Click Me" fontSize={size === 'sm' ? 14 : size === 'lg' ? 18 : 16} fontWeight="500" color="inherit" textAlign="center" lineHeight={1.5} />
       {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
     </button>
   );
@@ -66,16 +65,6 @@ const ButtonSettings = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Content */}
-      <div>
-        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Content</h4>
-        <label className="text-xs text-gray-600">
-          Label
-          <input type="text" value={props.text} onChange={(e) => setProp((p: ButtonProps) => { p.text = e.target.value; })}
-            className="w-full mt-1 px-2 py-1 border border-gray-200 rounded text-sm" />
-        </label>
-      </div>
-
       {/* Style */}
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Style</h4>
@@ -120,7 +109,6 @@ const ButtonSettings = () => {
 Button.craft = {
   displayName: 'Button',
   props: {
-    text: 'Click Me',
     variant: 'primary',
     size: 'md',
     disabled: false,

@@ -1,11 +1,10 @@
 import { useRef } from 'react';
-import { useNode } from '@craftjs/core';
+import { Element, useNode } from '@craftjs/core';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
-
+import { Text } from './Text';
 
 interface BadgeComponentProps {
-  text: string;
   variant: 'default' | 'success' | 'warning' | 'error' | 'gray';
 }
 
@@ -17,7 +16,7 @@ const variantClasses: Record<string, string> = {
   gray: 'bg-gray-100 text-gray-800',
 };
 
-export const BadgeComponent = ({ text, variant }: BadgeComponentProps) => {
+export const BadgeComponent = ({ variant }: BadgeComponentProps) => {
   const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLSpanElement>(null);
 
@@ -30,7 +29,7 @@ export const BadgeComponent = ({ text, variant }: BadgeComponentProps) => {
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move ${variantClasses[variant] || ''}`}
       style={{ position: 'relative', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', ...responsiveStyles }}
     >
-      {text}
+      <Element id="badge-text" is={Text} text="Badge" fontSize={12} fontWeight="500" color="inherit" textAlign="center" lineHeight={1.5} />
       {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
     </span>
   );
@@ -45,15 +44,6 @@ const BadgeSettings = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Content</h4>
-        <label className="text-xs text-gray-600">
-          Text
-          <input type="text" value={props.text} onChange={(e) => setProp((p: BadgeComponentProps) => { p.text = e.target.value; })}
-            className="w-full mt-1 px-2 py-1 border border-gray-200 rounded text-sm" />
-        </label>
-      </div>
-
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Style</h4>
         <label className="text-xs text-gray-600">
@@ -75,7 +65,6 @@ const BadgeSettings = () => {
 BadgeComponent.craft = {
   displayName: 'BadgeComponent',
   props: {
-    text: 'Badge',
     variant: 'default',
   } as BadgeComponentProps,
   related: {

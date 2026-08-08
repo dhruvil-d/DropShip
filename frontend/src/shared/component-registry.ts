@@ -273,10 +273,6 @@ export const componentRegistry: Record<string, ComponentDefinition> = {
     },
     props: [
       {
-        name: 'text', label: 'Label', control: 'text', defaultValue: 'Click Me',
-        behavior: { type: 'content' }, group: 'Content',
-      },
-      {
         name: 'variant', label: 'Variant', control: 'select', defaultValue: 'primary',
         options: [
           { label: 'Primary', value: 'primary' },
@@ -360,10 +356,6 @@ export const componentRegistry: Record<string, ComponentDefinition> = {
     isCanvas: false,
     props: [
       {
-        name: 'label', label: 'Label', control: 'text', defaultValue: 'Label',
-        behavior: { type: 'skip' }, group: 'Content',
-      },
-      {
         name: 'placeholder', label: 'Placeholder', control: 'text', defaultValue: 'Enter text...',
         behavior: { type: 'skip' }, group: 'Content',
       },
@@ -394,10 +386,6 @@ export const componentRegistry: Record<string, ComponentDefinition> = {
     isCanvas: false,
     props: [
       {
-        name: 'label', label: 'Label', control: 'text', defaultValue: 'Message',
-        behavior: { type: 'skip' }, group: 'Content',
-      },
-      {
         name: 'placeholder', label: 'Placeholder', control: 'text', defaultValue: 'Enter message...',
         behavior: { type: 'skip' }, group: 'Content',
       },
@@ -421,10 +409,6 @@ export const componentRegistry: Record<string, ComponentDefinition> = {
     baseClasses: 'flex flex-col gap-1',
     isCanvas: false,
     props: [
-      {
-        name: 'label', label: 'Label', control: 'text', defaultValue: 'Select',
-        behavior: { type: 'skip' }, group: 'Content',
-      },
       {
         name: 'options', label: 'Options (comma-separated)', control: 'text', defaultValue: 'Option 1,Option 2,Option 3',
         behavior: { type: 'skip' }, group: 'Content',
@@ -627,10 +611,6 @@ export const componentRegistry: Record<string, ComponentDefinition> = {
     },
     props: [
       {
-        name: 'text', label: 'Text', control: 'text', defaultValue: 'Badge',
-        behavior: { type: 'content' }, group: 'Content',
-      },
-      {
         name: 'variant', label: 'Variant', control: 'select', defaultValue: 'default',
         options: [
           { label: 'Default', value: 'default' },
@@ -682,14 +662,6 @@ export const componentRegistry: Record<string, ComponentDefinition> = {
       },
     },
     props: [
-      {
-        name: 'title', label: 'Title', control: 'text', defaultValue: 'Heads up!',
-        behavior: { type: 'skip' }, group: 'Content',
-      },
-      {
-        name: 'message', label: 'Message', control: 'textarea', defaultValue: 'This is an informational alert message.',
-        behavior: { type: 'skip' }, group: 'Content',
-      },
       {
         name: 'variant', label: 'Variant', control: 'select', defaultValue: 'info',
         options: [
