@@ -6,6 +6,7 @@
 import { useCallback, useEffect } from 'react';
 import { useNode } from '@craftjs/core';
 import { useResponsiveStore } from '../shared/responsiveStore';
+import { useDarkModeStore } from '../shared/darkModeStore';
 import type { DimensionsMeta } from '../shared/responsiveStore';
 
 export interface ResponsiveNodeResult {
@@ -15,6 +16,8 @@ export interface ResponsiveNodeResult {
   isSelected: boolean;
   /** Whether this node is hovered */
   isHovered: boolean;
+  /** Whether this node should render in dark mode */
+  isDark: boolean;
   /** The active breakpoint's dimension metadata (null if none set) */
   activeMeta: DimensionsMeta | null;
   /** Style overrides to spread onto the component's root element */
@@ -47,6 +50,9 @@ export function useResponsiveNode(): ResponsiveNodeResult {
   });
 
   const ensureComponentMeta = useResponsiveStore((s) => s.ensureComponentMeta);
+
+  // Dark mode resolution
+  const isDark = useDarkModeStore((s) => s.getResolvedMode(id) === 'dark');
 
   // Ensure this component has metadata entries in the store
   useEffect(() => {
@@ -135,6 +141,7 @@ export function useResponsiveNode(): ResponsiveNodeResult {
     nodeId: id,
     isSelected,
     isHovered,
+    isDark,
     activeMeta,
     responsiveStyles,
     connectRef,

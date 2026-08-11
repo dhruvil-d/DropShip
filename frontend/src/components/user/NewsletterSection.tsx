@@ -2,17 +2,24 @@ import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
+import { deriveDarkColor } from '../../shared/colorTransform';
+import { ColorPickerControl } from '../editor/ColorPickerControl';
 
 interface NewsletterSectionProps {
   padding: number;
   background: string;
+  backgroundDark?: string;
   textAlign: 'left' | 'center' | 'right';
   children?: React.ReactNode;
 }
 
-export const NewsletterSection = ({ padding, background, textAlign, children }: NewsletterSectionProps) => {
-  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+export const NewsletterSection = ({ padding, background, backgroundDark, textAlign, children }: NewsletterSectionProps) => {
+  const { connectRef, isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLDivElement>(null);
+
+  const activeBg = isDark
+    ? (backgroundDark || deriveDarkColor(background, 'background'))
+    : background;
 
   return (
     <div
@@ -22,7 +29,7 @@ export const NewsletterSection = ({ padding, background, textAlign, children }: 
       }}
       style={{
         padding: `${padding}px`,
-        backgroundColor: background,
+        backgroundColor: activeBg,
         textAlign,
         display: 'flex',
         flexDirection: 'column',
@@ -66,12 +73,15 @@ const NewsletterSettings = () => {
       </div>
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Colors</h4>
-        <label className="text-xs text-gray-600 flex items-center gap-2">
-          Background
-          <input type="color" value={props.background} onChange={(e) => setProp((p: NewsletterSectionProps) => { p.background = e.target.value; })}
-            className="w-8 h-8 rounded border border-gray-200 cursor-pointer" />
-          <span className="text-xs text-gray-400 font-mono">{props.background}</span>
-        </label>
+        <ColorPickerControl
+          label="Background"
+          role="background"
+          lightColor={props.background}
+          darkColorOverride={props.backgroundDark}
+          onLightChange={(color) => setProp((p: NewsletterSectionProps) => { p.background = color; })}
+          onDarkChange={(color) => setProp((p: NewsletterSectionProps) => { p.backgroundDark = color; })}
+          onDarkReset={() => setProp((p: NewsletterSectionProps) => { p.backgroundDark = undefined; })}
+        />
       </div>
     </div>
   );

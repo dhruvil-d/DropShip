@@ -2,18 +2,28 @@ import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
+import { deriveDarkColor } from '../../shared/colorTransform';
+import { ColorPickerControl } from '../editor/ColorPickerControl';
 
 interface PricingCardProps {
   padding: number;
   background: string;
+  backgroundDark?: string;
   borderRadius: number;
   highlighted: boolean;
   children?: React.ReactNode;
 }
 
-export const PricingCard = ({ padding, background, borderRadius, highlighted, children }: PricingCardProps) => {
-  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+export const PricingCard = ({ padding, background, backgroundDark, borderRadius, highlighted, children }: PricingCardProps) => {
+  const { connectRef, isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLDivElement>(null);
+
+  const activeBg = isDark
+    ? (backgroundDark || deriveDarkColor(background, 'background'))
+    : background;
+  const activeBorder = isDark
+    ? deriveDarkColor('#e5e7eb', 'border')
+    : '#e5e7eb';
 
   return (
     <div
@@ -23,11 +33,11 @@ export const PricingCard = ({ padding, background, borderRadius, highlighted, ch
       }}
       style={{
         padding: `${padding}px`,
-        backgroundColor: background,
+        backgroundColor: activeBg,
         borderRadius: `${borderRadius}px`,
         display: 'flex',
         flexDirection: 'column',
-        border: '1px solid #e5e7eb',
+        border: `1px solid ${activeBorder}`,
         position: 'relative',
         transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
         ...responsiveStyles,
@@ -64,12 +74,15 @@ const PricingCardSettings = () => {
       </div>
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Colors</h4>
-        <label className="text-xs text-gray-600 flex items-center gap-2">
-          Background
-          <input type="color" value={props.background} onChange={(e) => setProp((p: PricingCardProps) => { p.background = e.target.value; })}
-            className="w-8 h-8 rounded border border-gray-200 cursor-pointer" />
-          <span className="text-xs text-gray-400 font-mono">{props.background}</span>
-        </label>
+        <ColorPickerControl
+          label="Background"
+          role="background"
+          lightColor={props.background}
+          darkColorOverride={props.backgroundDark}
+          onLightChange={(color) => setProp((p: PricingCardProps) => { p.background = color; })}
+          onDarkChange={(color) => setProp((p: PricingCardProps) => { p.backgroundDark = color; })}
+          onDarkReset={() => setProp((p: PricingCardProps) => { p.backgroundDark = undefined; })}
+        />
       </div>
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Highlight</h4>

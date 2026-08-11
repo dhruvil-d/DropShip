@@ -24,13 +24,20 @@ const sizeClasses: Record<string, string> = {
 };
 
 export const Button = ({ variant, size, disabled, fullWidth }: ButtonProps) => {
-  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const { connectRef, isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLButtonElement>(null);
+
+  // Dark-aware variant classes — softer slate tones
+  const darkVariantClasses: Record<string, string> = {
+    primary: 'bg-blue-500 text-white hover:bg-blue-400',
+    secondary: 'bg-slate-700 text-slate-200 hover:bg-slate-600',
+    outline: 'border border-blue-400 text-blue-400 bg-transparent hover:bg-blue-950/30',
+  };
 
   const classes = [
     'rounded font-medium cursor-move border-0 outline-transparent',
     'hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all',
-    variantClasses[variant] || '',
+    (isDark ? darkVariantClasses[variant] : variantClasses[variant]) || '',
     sizeClasses[size] || '',
     fullWidth ? 'w-full' : '',
     disabled ? 'opacity-50 cursor-not-allowed' : '',

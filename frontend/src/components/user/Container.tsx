@@ -2,6 +2,8 @@ import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
+import { deriveDarkColor } from '../../shared/colorTransform';
+import { ColorPickerControl } from '../editor/ColorPickerControl';
 
 
 interface ContainerProps {
@@ -10,6 +12,7 @@ interface ContainerProps {
   gap: number;
   flexDirection: 'column' | 'row' | 'column-reverse' | 'row-reverse';
   background: string;
+  backgroundDark?: string; // Explicit user override for dark mode
   borderRadius: number;
   shadow: 'none' | 'sm' | 'md' | 'lg' | 'xl';
   minHeight: number | string;
@@ -25,11 +28,16 @@ const shadowClasses: Record<string, string> = {
 };
 
 export const Container = ({
-  padding, margin, gap, flexDirection, background,
+  padding, margin, gap, flexDirection, background, backgroundDark,
   borderRadius, shadow, minHeight, children,
 }: ContainerProps) => {
-  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const { connectRef, isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLDivElement>(null);
+
+  // Derive dark counterpart using explicit 'background' role
+  const activeBg = isDark
+    ? (backgroundDark || deriveDarkColor(background, 'background'))
+    : background;
 
   return (
     <div
@@ -42,7 +50,7 @@ export const Container = ({
         margin: `${margin}px`,
         gap: `${gap}px`,
         flexDirection,
-        backgroundColor: background,
+        backgroundColor: activeBg,
         borderRadius: `${borderRadius}px`,
         minHeight: typeof minHeight === 'number' ? `${minHeight}px` : minHeight,
         display: 'flex',
@@ -107,12 +115,15 @@ const ContainerSettings = () => {
       {/* Colors */}
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Colors</h4>
-        <label className="text-xs text-gray-600 flex items-center gap-2">
-          Background
-          <input type="color" value={props.background} onChange={(e) => setProp((p: ContainerProps) => { p.background = e.target.value; })}
-            className="w-8 h-8 rounded border border-gray-200 cursor-pointer" />
-          <span className="text-xs text-gray-400 font-mono">{props.background}</span>
-        </label>
+        <ColorPickerControl
+          label="Background"
+          role="background"
+          lightColor={props.background}
+          darkColorOverride={props.backgroundDark}
+          onLightChange={(color) => setProp((p: ContainerProps) => { p.background = color; })}
+          onDarkChange={(color) => setProp((p: ContainerProps) => { p.backgroundDark = color; })}
+          onDarkReset={() => setProp((p: ContainerProps) => { p.backgroundDark = undefined; })}
+        />
       </div>
 
       {/* Borders */}

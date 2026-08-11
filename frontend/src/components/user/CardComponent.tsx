@@ -2,15 +2,19 @@ import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
+import { deriveDarkColor } from '../../shared/colorTransform';
+import { ColorPickerControl } from '../editor/ColorPickerControl';
 
 
 interface CardComponentProps {
   padding: number;
   background: string;
+  backgroundDark?: string;
   borderRadius: number;
   shadow: 'none' | 'sm' | 'md' | 'lg';
   borderWidth: number;
   borderColor: string;
+  borderColorDark?: string;
   children?: React.ReactNode;
 }
 
@@ -22,10 +26,17 @@ const shadowClasses: Record<string, string> = {
 };
 
 export const CardComponent = ({
-  padding, background, borderRadius, shadow, borderWidth, borderColor, children,
+  padding, background, backgroundDark, borderRadius, shadow, borderWidth, borderColor, borderColorDark, children,
 }: CardComponentProps) => {
-  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const { connectRef, isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLDivElement>(null);
+
+  const activeBg = isDark
+    ? (backgroundDark || deriveDarkColor(background, 'background'))
+    : background;
+  const activeBorder = isDark
+    ? (borderColorDark || deriveDarkColor(borderColor, 'border'))
+    : borderColor;
 
   return (
     <div
@@ -35,10 +46,10 @@ export const CardComponent = ({
       }}
       style={{
         padding: `${padding}px`,
-        backgroundColor: background,
+        backgroundColor: activeBg,
         borderRadius: `${borderRadius}px`,
         borderWidth: `${borderWidth}px`,
-        borderColor,
+        borderColor: activeBorder,
         borderStyle: 'solid',
         position: 'relative',
         transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -72,12 +83,15 @@ const CardSettings = () => {
 
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Colors</h4>
-        <label className="text-xs text-gray-600 flex items-center gap-2">
-          Background
-          <input type="color" value={props.background} onChange={(e) => setProp((p: CardComponentProps) => { p.background = e.target.value; })}
-            className="w-8 h-8 rounded border border-gray-200 cursor-pointer" />
-          <span className="text-xs text-gray-400 font-mono">{props.background}</span>
-        </label>
+        <ColorPickerControl
+          label="Background"
+          role="background"
+          lightColor={props.background}
+          darkColorOverride={props.backgroundDark}
+          onLightChange={(color) => setProp((p: CardComponentProps) => { p.background = color; })}
+          onDarkChange={(color) => setProp((p: CardComponentProps) => { p.backgroundDark = color; })}
+          onDarkReset={() => setProp((p: CardComponentProps) => { p.backgroundDark = undefined; })}
+        />
       </div>
 
       <div>
@@ -94,12 +108,15 @@ const CardSettings = () => {
               className="w-full mt-1 px-2 py-1 border border-gray-200 rounded text-sm" />
           </label>
         </div>
-        <label className="text-xs text-gray-600 mt-2 flex items-center gap-2">
-          Border Color
-          <input type="color" value={props.borderColor} onChange={(e) => setProp((p: CardComponentProps) => { p.borderColor = e.target.value; })}
-            className="w-8 h-8 rounded border border-gray-200 cursor-pointer" />
-          <span className="text-xs text-gray-400 font-mono">{props.borderColor}</span>
-        </label>
+        <ColorPickerControl
+          label="Border Color"
+          role="border"
+          lightColor={props.borderColor}
+          darkColorOverride={props.borderColorDark}
+          onLightChange={(color) => setProp((p: CardComponentProps) => { p.borderColor = color; })}
+          onDarkChange={(color) => setProp((p: CardComponentProps) => { p.borderColorDark = color; })}
+          onDarkReset={() => setProp((p: CardComponentProps) => { p.borderColorDark = undefined; })}
+        />
       </div>
 
       <div>

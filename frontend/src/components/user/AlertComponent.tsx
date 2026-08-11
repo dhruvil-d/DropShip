@@ -17,10 +17,19 @@ const variantConfig: Record<string, { bg: string; border: string; text: string; 
   error:   { bg: 'bg-red-50',     border: 'border-red-200',    text: 'text-red-800',    icon: XCircle },
 };
 
+const darkVariantConfig: Record<string, { bg: string; border: string; text: string; icon: typeof AlertCircle }> = {
+  info:    { bg: 'bg-blue-950/40',    border: 'border-blue-800/60',   text: 'text-blue-300',   icon: AlertCircle },
+  success: { bg: 'bg-green-950/40',   border: 'border-green-800/60',  text: 'text-green-300',  icon: CheckCircle },
+  warning: { bg: 'bg-yellow-950/40',  border: 'border-yellow-800/60', text: 'text-yellow-300', icon: AlertTriangle },
+  error:   { bg: 'bg-red-950/40',     border: 'border-red-800/60',    text: 'text-red-300',    icon: XCircle },
+};
+
 export const AlertComponent = ({ variant }: AlertComponentProps) => {
-  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const { connectRef, isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLDivElement>(null);
-  const config = variantConfig[variant] || variantConfig.info;
+  const config = isDark
+    ? (darkVariantConfig[variant] || darkVariantConfig.info)
+    : (variantConfig[variant] || variantConfig.info);
   const Icon = config.icon;
 
   return (

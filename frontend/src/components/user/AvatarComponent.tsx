@@ -24,7 +24,7 @@ const shapeClasses: Record<string, string> = {
 };
 
 export const AvatarComponent = ({ src, alt, fallbackText, size, shape }: AvatarComponentProps) => {
-  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const { connectRef, isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -33,7 +33,7 @@ export const AvatarComponent = ({ src, alt, fallbackText, size, shape }: AvatarC
         elementRef.current = ref;
         connectRef(ref);
       }}
-      className={`inline-flex items-center justify-center bg-gray-200 text-gray-600 font-medium overflow-hidden outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move ${sizeClasses[size] || ''} ${shapeClasses[shape] || ''}`}
+      className={`inline-flex items-center justify-center ${isDark ? 'bg-slate-700 text-slate-300' : 'bg-gray-200 text-gray-600'} font-medium overflow-hidden outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move ${sizeClasses[size] || ''} ${shapeClasses[shape] || ''}`}
       style={{ position: 'relative', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', ...responsiveStyles }}
     >
       {src ? (

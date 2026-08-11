@@ -3,6 +3,9 @@ import { useNode } from '@craftjs/core';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
 import { RichTextToolbar } from '../editor/RichTextToolbar';
+import { deriveDarkColor } from '../../shared/colorTransform';
+import { ColorPickerControl } from '../editor/ColorPickerControl';
+
 
 
 interface TextProps {
@@ -11,15 +14,21 @@ interface TextProps {
   fontSize: number;
   fontWeight: string;
   color: string;
-  textAlign: 'left' | 'center' | 'right';
+  colorDark?: string;
+  textAlign: 'left' | 'center' | 'right' | 'justify';
   lineHeight: number;
 }
 
-export const Text = ({ text, fontSize, fontWeight, color, textAlign, lineHeight }: TextProps) => {
-  const { isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+export const Text = ({ text, fontSize, fontWeight, color, colorDark, textAlign, lineHeight }: TextProps) => {
+  const { isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const { actions: { setProp }, connectors: { connect } } = useNode();
   const elementRef = useRef<HTMLParagraphElement>(null);
   const startFontSizeRef = useRef(fontSize);
+
+  // Derive dark counterpart using explicit 'text' role
+  const activeColor = isDark
+    ? (colorDark || deriveDarkColor(color, 'text'))
+    : color;
 
   // Track whether the content was changed internally (by user typing) to avoid
   // the sync effect from overwriting the user's edits
@@ -123,14 +132,14 @@ export const Text = ({ text, fontSize, fontWeight, color, textAlign, lineHeight 
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         style={{
+          ...responsiveStyles,
           fontSize: `${fontSize}px`,
           fontWeight,
-          color,
-          textAlign,
           lineHeight,
+          color: activeColor,
+          textAlign,
           position: 'relative',
           transition: isSelected ? 'none' : 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-          ...responsiveStyles,
         }}
         className={`m-0 p-1 transition-all outline-transparent rich-text-editable ${
           isSelected
@@ -223,12 +232,15 @@ const TextSettings = () => {
           </select>
         </label>
 
-        <label className="text-xs text-gray-600 mt-2 flex items-center gap-2">
-          Color
-          <input type="color" value={props.color} onChange={(e) => setProp((p: TextProps) => { p.color = e.target.value; })}
-            className="w-8 h-8 rounded border border-gray-200 cursor-pointer" />
-          <span className="text-xs text-gray-400 font-mono">{props.color}</span>
-        </label>
+        <ColorPickerControl
+          label="Text Color"
+          role="text"
+          lightColor={props.color}
+          darkColorOverride={props.colorDark}
+          onLightChange={(color) => setProp((p: TextProps) => { p.color = color; })}
+          onDarkChange={(color) => setProp((p: TextProps) => { p.colorDark = color; })}
+          onDarkReset={() => setProp((p: TextProps) => { p.colorDark = undefined; })}
+        />
       </div>
     </div>
   );

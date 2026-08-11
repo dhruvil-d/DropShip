@@ -16,7 +16,7 @@ const spacingClasses: Record<string, string> = {
 };
 
 export const ListComponent = ({ items, ordered, spacing }: ListComponentProps) => {
-  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const { connectRef, isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLOListElement | HTMLUListElement>(null);
   const Tag = ordered ? 'ol' : 'ul';
   const listItems = items.split(',').map(s => s.trim()).filter(Boolean);
@@ -27,7 +27,7 @@ export const ListComponent = ({ items, ordered, spacing }: ListComponentProps) =
         elementRef.current = ref;
         connectRef(ref);
       }}
-      className={`${ordered ? 'list-decimal' : 'list-disc'} pl-5 ${spacingClasses[spacing] || ''} text-gray-700 outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move`}
+      className={`${ordered ? 'list-decimal' : 'list-disc'} pl-5 ${spacingClasses[spacing] || ''} ${isDark ? 'text-slate-300' : 'text-gray-700'} outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move`}
       style={{ position: 'relative', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', ...responsiveStyles }}
     >
       {listItems.map((item, i) => (

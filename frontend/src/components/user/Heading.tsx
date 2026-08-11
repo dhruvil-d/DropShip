@@ -3,6 +3,9 @@ import { useNode } from '@craftjs/core';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
 import { RichTextToolbar } from '../editor/RichTextToolbar';
+import { deriveDarkColor } from '../../shared/colorTransform';
+import { ColorPickerControl } from '../editor/ColorPickerControl';
+
 
 
 interface HeadingProps {
@@ -10,16 +13,23 @@ interface HeadingProps {
   text: string;
   level: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   fontSize: number;
+  fontWeight: string;
   color: string;
-  textAlign: 'left' | 'center' | 'right';
+  colorDark?: string;
+  textAlign: 'left' | 'center' | 'right' | 'justify';
 }
 
-export const Heading = ({ text, level, fontSize, color, textAlign }: HeadingProps) => {
-  const { isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+export const Heading = ({ text, level, fontSize, fontWeight, color, colorDark, textAlign }: HeadingProps) => {
+  const { isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const { actions: { setProp }, connectors: { connect } } = useNode();
   const elementRef = useRef<HTMLHeadingElement>(null);
   const startFontSizeRef = useRef(fontSize);
   const Tag = level;
+
+  // Derive dark counterpart using explicit 'text' role
+  const activeColor = isDark
+    ? (colorDark || deriveDarkColor(color, 'text'))
+    : color;
 
   const internalChangeRef = useRef(false);
   const latestTextRef = useRef(text);
@@ -113,14 +123,15 @@ export const Heading = ({ text, level, fontSize, color, textAlign }: HeadingProp
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         style={{
+          ...responsiveStyles,
           fontSize: `${fontSize}px`,
-          color,
+          fontWeight,
+          color: activeColor,
           textAlign,
           position: 'relative',
           transition: isSelected ? 'none' : 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-          ...responsiveStyles,
         }}
-        className={`m-0 font-bold transition-all outline-transparent rich-text-editable ${
+        className={`m-0 transition-all outline-transparent rich-text-editable ${
           isSelected
             ? 'rich-text-editing-ring cursor-text'
             : 'hover:outline-blue-400 hover:outline-dashed hover:outline-2 cursor-text'
@@ -198,12 +209,15 @@ const HeadingSettings = () => {
             <option value="right">Right</option>
           </select>
         </label>
-        <label className="text-xs text-gray-600 mt-2 flex items-center gap-2">
-          Color
-          <input type="color" value={props.color} onChange={(e) => setProp((p: HeadingProps) => { p.color = e.target.value; })}
-            className="w-8 h-8 rounded border border-gray-200 cursor-pointer" />
-          <span className="text-xs text-gray-400 font-mono">{props.color}</span>
-        </label>
+        <ColorPickerControl
+          label="Text Color"
+          role="text"
+          lightColor={props.color}
+          darkColorOverride={props.colorDark}
+          onLightChange={(color) => setProp((p: HeadingProps) => { p.color = color; })}
+          onDarkChange={(color) => setProp((p: HeadingProps) => { p.colorDark = color; })}
+          onDarkReset={() => setProp((p: HeadingProps) => { p.colorDark = undefined; })}
+        />
       </div>
     </div>
   );

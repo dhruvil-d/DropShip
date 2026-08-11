@@ -7,9 +7,11 @@
 
 import { createElement, useState, useRef, useEffect } from 'react';
 import { useEditor } from '@craftjs/core';
-import { Settings2, Palette, MonitorSmartphone, MousePointerClick } from 'lucide-react';
+import { Settings2, Palette, MonitorSmartphone, MousePointerClick, Moon, Sun, ArrowDownUp } from 'lucide-react';
 import { DesignControls } from './settings/DesignControls';
 import { ResponsiveControls } from './settings/ResponsiveControls';
+import { useDarkModeStore } from '../../shared/darkModeStore';
+import type { DarkModeOverride } from '../../shared/darkModeStore';
 import '../../styles/settings-animations.css';
 
 type SettingsTab = 'properties' | 'design' | 'responsive';
@@ -19,6 +21,62 @@ const tabs: { key: SettingsTab; label: string; icon: React.ReactNode }[] = [
   { key: 'design', label: 'Design', icon: <Palette className="w-4 h-4" /> },
   { key: 'responsive', label: 'Responsive', icon: <MonitorSmartphone className="w-4 h-4" /> },
 ];
+
+// ------ Dark Mode Override Widget ------
+
+const overrideOptions: { value: DarkModeOverride; label: string; icon: React.ReactNode }[] = [
+  { value: 'inherit', label: 'Inherit', icon: <ArrowDownUp size={12} /> },
+  { value: 'light', label: 'Light', icon: <Sun size={12} /> },
+  { value: 'dark', label: 'Dark', icon: <Moon size={12} /> },
+];
+
+function DarkModeOverrideWidget({ nodeId }: { nodeId: string }) {
+  const override = useDarkModeStore((s) => s.componentOverrides[nodeId] || 'inherit');
+  const setOverride = useDarkModeStore((s) => s.setComponentOverride);
+  const globalDarkMode = useDarkModeStore((s) => s.globalDarkMode);
+
+  const resolvedLabel = override === 'inherit'
+    ? (globalDarkMode ? 'Dark (global)' : 'Light (global)')
+    : override === 'dark' ? 'Dark' : 'Light';
+
+  return (
+    <div className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-100">
+      <div className="flex items-center gap-2">
+        <div className={`w-5 h-5 rounded flex items-center justify-center ${
+          (override === 'dark' || (override === 'inherit' && globalDarkMode))
+            ? 'bg-indigo-100 text-indigo-600'
+            : 'bg-amber-100 text-amber-600'
+        }`}>
+          {(override === 'dark' || (override === 'inherit' && globalDarkMode))
+            ? <Moon size={12} />
+            : <Sun size={12} />
+          }
+        </div>
+        <div>
+          <div className="text-[10px] text-gray-400 uppercase tracking-wider leading-none">Theme</div>
+          <div className="text-xs font-medium text-gray-700 leading-tight mt-0.5">{resolvedLabel}</div>
+        </div>
+      </div>
+      <div className="flex bg-white rounded-md border border-gray-200 overflow-hidden">
+        {overrideOptions.map((opt) => (
+          <button
+            key={opt.value}
+            onClick={() => setOverride(nodeId, opt.value)}
+            className={`flex items-center gap-1 px-2 py-1 text-[10px] font-medium transition-all ${
+              override === opt.value
+                ? 'bg-blue-50 text-blue-700 border-blue-200'
+                : 'text-gray-500 hover:bg-gray-50'
+            }`}
+            title={opt.label}
+          >
+            {opt.icon}
+            {opt.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export const SettingsPanel = () => {
   const { actions, selected, isEnabled } = useEditor((state, query) => {
@@ -117,6 +175,9 @@ export const SettingsPanel = () => {
             <>
               {selected ? (
                 <div className="flex flex-col gap-4">
+                  {/* Dark Mode Override */}
+                  <DarkModeOverrideWidget nodeId={selected.id} />
+
                   <div data-cy="settings-panel">
                     {selected.settings ? createElement(selected.settings) : (
                       <div className="text-sm text-gray-500 italic">No settings available for this component.</div>

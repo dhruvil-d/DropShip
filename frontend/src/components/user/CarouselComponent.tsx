@@ -28,7 +28,7 @@ export const Carousel = ({
   height,
   objectFit,
 }: CarouselProps) => {
-  const { isSelected, responsiveStyles } = useResponsiveNode();
+  const { isSelected, isDark, responsiveStyles } = useResponsiveNode();
   const { connectors: { connect } } = useNode();
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -72,7 +72,7 @@ export const Carousel = ({
         overflow: 'hidden',
         ...responsiveStyles,
       }}
-      className={`group bg-gray-100 flex items-center justify-center transition-all ${
+      className={`group ${isDark ? 'bg-slate-800' : 'bg-gray-100'} flex items-center justify-center transition-all ${
         isSelected ? 'outline outline-2 outline-blue-500' : 'hover:outline hover:outline-2 hover:outline-blue-400 hover:outline-dashed outline-transparent'
       }`}
     >

@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Color Transform Test Matrix</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin:20px; background:#f9fafb }
+    h1 { font-size:18px; margin-bottom:4px }
+    p { font-size:13px; color:#666; margin-top:0 }
+    table { border-collapse:collapse; width:100% }
+    th, td { border:1px solid #e5e7eb; text-align:center }
+    .legend { display:flex; gap:16px; margin:12px 0; font-size:12px; color:#888 }
+    .legend span { display:inline-flex; align-items:center; gap:4px }
+    .legend .box { width:14px; height:14px; border:1px solid #ccc; display:inline-block }
+  </style>
+</head>
+<body>
+  <h1>OKLCH Color Transform — Role-Aware Test Matrix</h1>
+  <p>Each cell shows <strong>Light (left)</strong> → <strong>Dark (right)</strong>. Same source color, different role = different transformation.</p>
+  <div class="legend">
+    <span><div class="box" style="background:#fff"></div> Light source</span>
+    <span><div class="box" style="background:#1a1a1e"></div> Dark derived</span>
+  </div>
+  <table>
+    <thead><tr><th style="padding:8px 4px; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:#666; border-bottom:2px solid #ddd">background</th><th style="padding:8px 4px; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:#666; border-bottom:2px solid #ddd">text</th><th style="padding:8px 4px; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:#666; border-bottom:2px solid #ddd">border</th><th style="padding:8px 4px; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:#666; border-bottom:2px solid #ddd">accent</th><th style="padding:8px 4px; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:#666; border-bottom:2px solid #ddd">input</th><th style="padding:8px 4px; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:#666; border-bottom:2px solid #ddd">icon</th></tr></thead>
+    <tbody><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#FFFFFF; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#FFFFFF</span>
+          </div>
+          <div style="width:50%; background:#121212; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#121212</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#FFFFFF; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#FFFFFF</span>
+          </div>
+          <div style="width:50%; background:#eeeeee; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#eeeeee</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#FFFFFF; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#FFFFFF</span>
+          </div>
+          <div style="width:50%; background:#333333; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#333333</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#FFFFFF; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#FFFFFF</span>
+          </div>
+          <div style="width:50%; background:#cecece; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#cecece</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#FFFFFF; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#FFFFFF</span>
+          </div>
+          <div style="width:50%; background:#1d1d1d; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#1d1d1d</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#FFFFFF; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#FFFFFF</span>
+          </div>
+          <div style="width:50%; background:#cecece; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#cecece</span>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#000000; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#000000</span>
+          </div>
+          <div style="width:50%; background:#000000; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#000000</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#000000; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#000000</span>
+          </div>
+          <div style="width:50%; background:#e8e8e8; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#e8e8e8</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#000000; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#000000</span>
+          </div>
+          <div style="width:50%; background:#484848; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#484848</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#000000; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#000000</span>
+          </div>
+          <div style="width:50%; background:#222222; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#222222</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#000000; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#000000</span>
+          </div>
+          <div style="width:50%; background:#1d1d1d; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#1d1d1d</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#000000; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#000000</span>
+          </div>
+          <div style="width:50%; background:#222222; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#222222</span>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#F5F5F5; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#F5F5F5</span>
+          </div>
+          <div style="width:50%; background:#121212; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#121212</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#F5F5F5; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#F5F5F5</span>
+          </div>
+          <div style="width:50%; background:#eeeeee; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#eeeeee</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#F5F5F5; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#F5F5F5</span>
+          </div>
+          <div style="width:50%; background:#333333; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#333333</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#F5F5F5; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#F5F5F5</span>
+          </div>
+          <div style="width:50%; background:#cecece; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#cecece</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#F5F5F5; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#F5F5F5</span>
+          </div>
+          <div style="width:50%; background:#1d1d1d; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#1d1d1d</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#F5F5F5; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#F5F5F5</span>
+          </div>
+          <div style="width:50%; background:#cecece; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#cecece</span>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#111111; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#111111</span>
+          </div>
+          <div style="width:50%; background:#111111; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#111111</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#111111; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#111111</span>
+          </div>
+          <div style="width:50%; background:#e8e8e8; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#e8e8e8</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#111111; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#111111</span>
+          </div>
+          <div style="width:50%; background:#484848; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#484848</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#111111; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#111111</span>
+          </div>
+          <div style="width:50%; background:#4f4f4f; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#4f4f4f</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#111111; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#111111</span>
+          </div>
+          <div style="width:50%; background:#1d1d1d; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#1d1d1d</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#111111; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#111111</span>
+          </div>
+          <div style="width:50%; background:#4f4f4f; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#4f4f4f</span>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#7C3AED; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#7C3AED</span>
+          </div>
+          <div style="width:50%; background:#1b0042; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#1b0042</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#7C3AED; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#7C3AED</span>
+          </div>
+          <div style="width:50%; background:#cbbfff; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#cbbfff</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#7C3AED; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#7C3AED</span>
+          </div>
+          <div style="width:50%; background:#3e2e69; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#3e2e69</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#7C3AED; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#7C3AED</span>
+          </div>
+          <div style="width:50%; background:#8443f8; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#8443f8</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#7C3AED; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#7C3AED</span>
+          </div>
+          <div style="width:50%; background:#23044e; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#23044e</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#7C3AED; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#7C3AED</span>
+          </div>
+          <div style="width:50%; background:#8443f8; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#8443f8</span>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#6366F1; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#6366F1</span>
+          </div>
+          <div style="width:50%; background:#10034b; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#10034b</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#6366F1; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#6366F1</span>
+          </div>
+          <div style="width:50%; background:#b7c1ff; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#b7c1ff</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#6366F1; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#6366F1</span>
+          </div>
+          <div style="width:50%; background:#2f336d; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#2f336d</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#6366F1; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#6366F1</span>
+          </div>
+          <div style="width:50%; background:#6a6eff; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#6a6eff</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#6366F1; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#6366F1</span>
+          </div>
+          <div style="width:50%; background:#150b53; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#150b53</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#6366F1; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#6366F1</span>
+          </div>
+          <div style="width:50%; background:#6a6eff; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#6a6eff</span>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#3B82F6; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#3B82F6</span>
+          </div>
+          <div style="width:50%; background:#001642; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#001642</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#3B82F6; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#3B82F6</span>
+          </div>
+          <div style="width:50%; background:#9ec3ff; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#9ec3ff</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#3B82F6; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#3B82F6</span>
+          </div>
+          <div style="width:50%; background:#18386e; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#18386e</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#3B82F6; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#3B82F6</span>
+          </div>
+          <div style="width:50%; background:#468cff; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#468cff</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#3B82F6; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#3B82F6</span>
+          </div>
+          <div style="width:50%; background:#001947; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#001947</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#3B82F6; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#3B82F6</span>
+          </div>
+          <div style="width:50%; background:#468cff; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#468cff</span>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#22C55E; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#22C55E</span>
+          </div>
+          <div style="width:50%; background:#002b0e; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#002b0e</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#22C55E; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#22C55E</span>
+          </div>
+          <div style="width:50%; background:#36da6d; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#36da6d</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#22C55E; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#22C55E</span>
+          </div>
+          <div style="width:50%; background:#115527; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#115527</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#22C55E; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#22C55E</span>
+          </div>
+          <div style="width:50%; background:#00c559; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#00c559</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#22C55E; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#22C55E</span>
+          </div>
+          <div style="width:50%; background:#002b0e; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#002b0e</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#22C55E; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#22C55E</span>
+          </div>
+          <div style="width:50%; background:#00c559; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#00c559</span>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#EF4444; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#EF4444</span>
+          </div>
+          <div style="width:50%; background:#3b0003; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#3b0003</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#EF4444; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#EF4444</span>
+          </div>
+          <div style="width:50%; background:#ffa59d; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#ffa59d</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#EF4444; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#EF4444</span>
+          </div>
+          <div style="width:50%; background:#65201e; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#65201e</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#EF4444; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#EF4444</span>
+          </div>
+          <div style="width:50%; background:#ff4949; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#ff4949</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#EF4444; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#EF4444</span>
+          </div>
+          <div style="width:50%; background:#3e0004; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#3e0004</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#EF4444; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#EF4444</span>
+          </div>
+          <div style="width:50%; background:#ff4949; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#ff4949</span>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#F59E0B; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#F59E0B</span>
+          </div>
+          <div style="width:50%; background:#382000; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#382000</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#F59E0B; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#F59E0B</span>
+          </div>
+          <div style="width:50%; background:#faa100; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#faa100</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#F59E0B; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#F59E0B</span>
+          </div>
+          <div style="width:50%; background:#6d4300; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#6d4300</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#F59E0B; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#F59E0B</span>
+          </div>
+          <div style="width:50%; background:#c47d00; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#c47d00</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#F59E0B; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#F59E0B</span>
+          </div>
+          <div style="width:50%; background:#382000; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#382000</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#F59E0B; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#F59E0B</span>
+          </div>
+          <div style="width:50%; background:#c47d00; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#c47d00</span>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#EC4899; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#EC4899</span>
+          </div>
+          <div style="width:50%; background:#3b0020; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#3b0020</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#EC4899; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#EC4899</span>
+          </div>
+          <div style="width:50%; background:#ff9bc4; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#ff9bc4</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#EC4899; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#EC4899</span>
+          </div>
+          <div style="width:50%; background:#632241; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#632241</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#EC4899; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#EC4899</span>
+          </div>
+          <div style="width:50%; background:#fe49a4; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#fe49a4</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#EC4899; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#EC4899</span>
+          </div>
+          <div style="width:50%; background:#3b0020; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#3b0020</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#EC4899; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#EC4899</span>
+          </div>
+          <div style="width:50%; background:#fe49a4; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#fe49a4</span>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#14B8A6; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#14B8A6</span>
+          </div>
+          <div style="width:50%; background:#002722; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#002722</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#14B8A6; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#14B8A6</span>
+          </div>
+          <div style="width:50%; background:#37d5c1; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#37d5c1</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#14B8A6; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#14B8A6</span>
+          </div>
+          <div style="width:50%; background:#005047; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#005047</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#14B8A6; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#14B8A6</span>
+          </div>
+          <div style="width:50%; background:#00beab; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#00beab</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#14B8A6; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#14B8A6</span>
+          </div>
+          <div style="width:50%; background:#002722; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#002722</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#14B8A6; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#14B8A6</span>
+          </div>
+          <div style="width:50%; background:#00beab; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#00beab</span>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#FF5733; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#FF5733</span>
+          </div>
+          <div style="width:50%; background:#3e0700; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#3e0700</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#FF5733; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#FF5733</span>
+          </div>
+          <div style="width:50%; background:#ffa08a; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#ffa08a</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#FF5733; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#FF5733</span>
+          </div>
+          <div style="width:50%; background:#6c281a; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#6c281a</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#FF5733; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#FF5733</span>
+          </div>
+          <div style="width:50%; background:#ff7051; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#ff7051</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#FF5733; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#FF5733</span>
+          </div>
+          <div style="width:50%; background:#3e0700; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#3e0700</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#FF5733; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#FF5733</span>
+          </div>
+          <div style="width:50%; background:#ff7051; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#ff7051</span>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#123456; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#123456</span>
+          </div>
+          <div style="width:50%; background:#00162f; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#00162f</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#123456; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#123456</span>
+          </div>
+          <div style="width:50%; background:#d0e0f1; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#d0e0f1</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#123456; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#123456</span>
+          </div>
+          <div style="width:50%; background:#263c54; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#263c54</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#123456; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#123456</span>
+          </div>
+          <div style="width:50%; background:#517aa7; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#517aa7</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#123456; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#123456</span>
+          </div>
+          <div style="width:50%; background:#041e37; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#041e37</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#123456; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#123456</span>
+          </div>
+          <div style="width:50%; background:#517aa7; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#517aa7</span>
+          </div>
+        </div>
+      </td>
+    </tr><tr>
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#808080; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#808080</span>
+          </div>
+          <div style="width:50%; background:#181818; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#181818</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#808080; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#808080</span>
+          </div>
+          <div style="width:50%; background:#c4c4c4; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#c4c4c4</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#808080; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#808080</span>
+          </div>
+          <div style="width:50%; background:#3a3a3a; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#3a3a3a</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#808080; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#808080</span>
+          </div>
+          <div style="width:50%; background:#898989; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#898989</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#808080; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#808080</span>
+          </div>
+          <div style="width:50%; background:#1d1d1d; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#1d1d1d</span>
+          </div>
+        </div>
+      </td>
+    
+      <td style="padding:0">
+        <div style="display:flex; height:52px">
+          <div style="width:50%; background:#808080; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#fff; font-family:monospace">#808080</span>
+          </div>
+          <div style="width:50%; background:#898989; display:flex; align-items:center; justify-content:center">
+            <span style="font-size:10px; color:#000; font-family:monospace">#898989</span>
+          </div>
+        </div>
+      </td>
+    </tr></tbody>
+  </table>
+</body>
+</html>

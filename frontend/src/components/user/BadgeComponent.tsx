@@ -16,8 +16,16 @@ const variantClasses: Record<string, string> = {
   gray: 'bg-gray-100 text-gray-800',
 };
 
+const darkVariantClasses: Record<string, string> = {
+  default: 'bg-blue-900/40 text-blue-300',
+  success: 'bg-green-900/40 text-green-300',
+  warning: 'bg-yellow-900/40 text-yellow-300',
+  error: 'bg-red-900/40 text-red-300',
+  gray: 'bg-slate-700/60 text-slate-300',
+};
+
 export const BadgeComponent = ({ variant }: BadgeComponentProps) => {
-  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+  const { connectRef, isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLSpanElement>(null);
 
   return (
@@ -26,7 +34,7 @@ export const BadgeComponent = ({ variant }: BadgeComponentProps) => {
         elementRef.current = ref;
         connectRef(ref);
       }}
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move ${variantClasses[variant] || ''}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move ${(isDark ? darkVariantClasses[variant] : variantClasses[variant]) || ''}`}
       style={{ position: 'relative', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', ...responsiveStyles }}
     >
       <Element id="badge-text" is={Text} text="Badge" fontSize={12} fontWeight="500" color="inherit" textAlign="center" lineHeight={1.5} />

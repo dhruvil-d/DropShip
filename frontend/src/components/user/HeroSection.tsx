@@ -2,18 +2,25 @@ import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
+import { deriveDarkColor } from '../../shared/colorTransform';
+import { ColorPickerControl } from '../editor/ColorPickerControl';
 
 
 interface HeroSectionProps {
   padding: number;
   background: string;
+  backgroundDark?: string;
   textAlign: 'left' | 'center' | 'right';
   children?: React.ReactNode;
 }
 
-export const HeroSection = ({ padding, background, textAlign, children }: HeroSectionProps) => {
-  const { connectRef, isSelected, responsiveStyles, nodeId } = useResponsiveNode();
+export const HeroSection = ({ padding, background, backgroundDark, textAlign, children }: HeroSectionProps) => {
+  const { connectRef, isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLDivElement>(null);
+
+  const activeBg = isDark
+    ? (backgroundDark || deriveDarkColor(background, 'background'))
+    : background;
 
   return (
     <div
@@ -23,7 +30,7 @@ export const HeroSection = ({ padding, background, textAlign, children }: HeroSe
       }}
       style={{
         padding: `${padding}px`,
-        backgroundColor: background,
+        backgroundColor: activeBg,
         textAlign,
         display: 'flex',
         flexDirection: 'column',
@@ -67,12 +74,15 @@ const HeroSectionSettings = () => {
       </div>
       <div>
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Colors</h4>
-        <label className="text-xs text-gray-600 flex items-center gap-2">
-          Background
-          <input type="color" value={props.background} onChange={(e) => setProp((p: HeroSectionProps) => { p.background = e.target.value; })}
-            className="w-8 h-8 rounded border border-gray-200 cursor-pointer" />
-          <span className="text-xs text-gray-400 font-mono">{props.background}</span>
-        </label>
+        <ColorPickerControl
+          label="Background"
+          role="background"
+          lightColor={props.background}
+          darkColorOverride={props.backgroundDark}
+          onLightChange={(color) => setProp((p: HeroSectionProps) => { p.background = color; })}
+          onDarkChange={(color) => setProp((p: HeroSectionProps) => { p.backgroundDark = color; })}
+          onDarkReset={() => setProp((p: HeroSectionProps) => { p.backgroundDark = undefined; })}
+        />
       </div>
     </div>
   );

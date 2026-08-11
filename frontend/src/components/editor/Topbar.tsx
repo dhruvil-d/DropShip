@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useEditor } from '@craftjs/core';
-import { Play, Undo, Redo, Loader2, Save, Download } from 'lucide-react';
+import { Play, Undo, Redo, Loader2, Save, Download, Moon, Sun } from 'lucide-react';
 import { PreviewModal } from './PreviewModal';
+import { useDarkModeStore } from '../../shared/darkModeStore';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -15,6 +16,8 @@ export const Topbar = () => {
   const [compiledCode, setCompiledCode] = useState('');
   const [isCompiling, setIsCompiling] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saved'>('idle');
+  const globalDarkMode = useDarkModeStore((s) => s.globalDarkMode);
+  const toggleGlobalDarkMode = useDarkModeStore((s) => s.toggleGlobalDarkMode);
 
   const handleCompileAndPreview = async () => {
     setIsCompiling(true);
@@ -83,6 +86,34 @@ export const Topbar = () => {
             title="Load saved project"
           >
             <Download size={16} />
+          </button>
+
+          <div className="w-px h-6 bg-gray-200 mx-1"></div>
+
+          {/* Dark Mode Toggle */}
+          <button
+            onClick={toggleGlobalDarkMode}
+            className={`relative p-2 rounded-lg transition-all duration-300 ${
+              globalDarkMode
+                ? 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200'
+                : 'text-gray-500 hover:bg-gray-100'
+            }`}
+            title={globalDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            <div className="relative w-[18px] h-[18px]">
+              <Sun
+                size={18}
+                className={`absolute inset-0 transition-all duration-300 ${
+                  globalDarkMode ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'
+                }`}
+              />
+              <Moon
+                size={18}
+                className={`absolute inset-0 transition-all duration-300 ${
+                  globalDarkMode ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'
+                }`}
+              />
+            </div>
           </button>
 
           <div className="w-px h-6 bg-gray-200 mx-1"></div>

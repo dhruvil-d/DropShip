@@ -3,6 +3,7 @@ import { Topbar } from './components/editor/Topbar';
 import { Toolbox } from './components/editor/Toolbox';
 import { SettingsPanel } from './components/editor/SettingsPanel';
 import { useResponsiveStore } from './shared/responsiveStore';
+import { useDarkModeStore } from './shared/darkModeStore';
 
 // ------ User components ------
 import { Container } from './components/user/Container';
@@ -61,6 +62,7 @@ function App() {
   const activeBreakpoint = useResponsiveStore((s) => s.activeBreakpoint);
   const breakpoints = useResponsiveStore((s) => s.breakpoints);
   const activeWidth = breakpoints[activeBreakpoint].width;
+  const globalDarkMode = useDarkModeStore((s) => s.globalDarkMode);
 
   // Determine canvas frame class based on breakpoint
   const frameClass =
@@ -80,12 +82,14 @@ function App() {
           <Toolbox />
           
           {/* Main Canvas Area */}
-          <div className={`flex-1 overflow-y-auto flex justify-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeBreakpoint === 'desktop' ? 'bg-white p-0' : 'bg-gray-100 p-8'}`}>
+          <div className={`flex-1 overflow-y-auto flex justify-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${activeBreakpoint === 'desktop' ? (globalDarkMode ? 'bg-gray-900' : 'bg-white') + ' p-0' : (globalDarkMode ? 'bg-gray-800' : 'bg-gray-100') + ' p-8'}`}>
             <div
-              className={`w-full bg-white responsive-canvas ${frameClass} ${
+              className={`w-full responsive-canvas ${frameClass} transition-colors duration-500 ${
+                globalDarkMode ? 'bg-gray-900' : 'bg-white'
+              } ${
                 activeBreakpoint === 'desktop' 
                   ? 'min-h-full shadow-none border-none' 
-                  : 'shadow-xl min-h-[800px] border border-gray-200'
+                  : `shadow-xl min-h-[800px] border ${globalDarkMode ? 'border-gray-700' : 'border-gray-200'}`
               }`}
               style={{
                 maxWidth: activeBreakpoint === 'desktop' ? '100%' : `${activeWidth}px`,
@@ -106,13 +110,13 @@ function App() {
                   </Element>
                   <Element is={Container} padding={20} margin={0} background="#f9fafb" borderRadius={8} gap={12} flexDirection="row" shadow="none" minHeight={50} canvas>
                     <Element is={Container} padding={0} margin={0} gap={0} flexDirection="column" background="transparent" borderRadius={0} shadow="none" minHeight={0} canvas>
-                      <Button text="Get Started" variant="primary" size="md" disabled={false} fullWidth={false} />
+                      <Button variant="primary" size="md" disabled={false} fullWidth={false} />
                     </Element>
                     <Element is={Container} padding={0} margin={0} gap={0} flexDirection="column" background="transparent" borderRadius={0} shadow="none" minHeight={0} canvas>
-                      <Button text="Learn More" variant="outline" size="md" disabled={false} fullWidth={false} />
+                      <Button variant="outline" size="md" disabled={false} fullWidth={false} />
                     </Element>
                     <Element is={Container} padding={0} margin={0} gap={0} flexDirection="column" background="transparent" borderRadius={0} shadow="none" minHeight={0} canvas>
-                      <BadgeComponent text="New" variant="success" />
+                      <BadgeComponent variant="success" />
                     </Element>
                   </Element>
                 </Element>
