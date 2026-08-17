@@ -25,7 +25,7 @@ export const ChatPanel = () => {
     {
       id: 'welcome',
       role: 'ai',
-      content: "Hey! I'm your AI co-pilot. Select a component and tell me to change it, or describe a whole layout — I'll build it live on the canvas."
+      content: "Hey! I'm your AI co-pilot. Select a component and tell me to change it."
     }
   ]);
   const [input, setInput] = useState('');
