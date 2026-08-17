@@ -1,9 +1,10 @@
 import { Editor, Frame, Element } from '@craftjs/core';
 import { Topbar } from './components/editor/Topbar';
 import { Toolbox } from './components/editor/Toolbox';
-import { SettingsPanel } from './components/editor/SettingsPanel';
+import { RightSidebar } from './components/editor/RightSidebar';
 import { useResponsiveStore } from './shared/responsiveStore';
 import { useDarkModeStore } from './shared/darkModeStore';
+import { useDeleteKeyHandler } from './hooks/useDeleteKeyHandler';
 
 // ------ User components ------
 import { Container } from './components/user/Container';
@@ -58,6 +59,12 @@ const resolver = {
   Carousel,
 };
 
+// Keyboard shortcut handler — must be inside <Editor> to use useEditor
+function KeyboardShortcuts() {
+  useDeleteKeyHandler();
+  return null;
+}
+
 function App() {
   const activeBreakpoint = useResponsiveStore((s) => s.activeBreakpoint);
   const breakpoints = useResponsiveStore((s) => s.breakpoints);
@@ -75,6 +82,7 @@ function App() {
   return (
     <div className="h-screen flex flex-col bg-gray-100 font-sans">
       <Editor resolver={resolver}>
+        <KeyboardShortcuts />
         <Topbar />
         
         <div className="flex flex-1 overflow-hidden">
@@ -100,7 +108,7 @@ function App() {
               <Frame>
                 <Element is={Container} padding={40} margin={0} gap={12} flexDirection="column" background="#ffffff" borderRadius={0} shadow="none" minHeight="100vh" canvas>
                   <Element is={Container} padding={0} margin={0} gap={0} flexDirection="column" background="transparent" borderRadius={0} shadow="none" minHeight={0} canvas>
-                    <Heading text="Welcome to DropShip" level="h1" fontSize={32} color="#111827" textAlign="left" />
+                    <Heading text="Welcome to DropShip" level="h1" fontSize={32} fontWeight="700" color="#111827" textAlign="left" />
                   </Element>
                   <Element is={Container} padding={0} margin={0} gap={0} flexDirection="column" background="transparent" borderRadius={0} shadow="none" minHeight={0} canvas>
                     <Text text="Drag components from the left sidebar to start building your application. Try composite components like LoginForm or HeroSection for pre-built layouts." fontSize={16} fontWeight="400" color="#6b7280" textAlign="left" lineHeight={1.6} />
@@ -124,8 +132,8 @@ function App() {
             </div>
           </div>
           
-          {/* Right Sidebar — Properties */}
-          <SettingsPanel />
+          {/* Right Sidebar — Properties & AI Chat */}
+          <RightSidebar />
         </div>
       </Editor>
     </div>

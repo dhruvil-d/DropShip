@@ -1,8 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const t = require('@babel/types');
 const generate = require('@babel/generator').default;
 const registry = require('./component-registry');
+const { processAiChat, processAiChatStream } = require('./aiHandler');
 
 const app = express();
 app.use(cors());
@@ -546,4 +548,68 @@ app.post('/api/compile', (req, res) => {
   }
 });
 
+app.post('/api/ai/chat', async (req, res) => {
+  try {
+    const { prompt, currentState, selectedNodeId, selectedNodeName } = req.body;
+    if (!prompt || !currentState) {
+      return res.status(400).json({ error: "Missing prompt or currentState" });
+    }
+
+    // Detect undo/redo intent on the server so the frontend can handle it locally
+    const lower = prompt.toLowerCase().trim();
+    const undoPatterns = ['undo', 'undo that', 'go back', 'revert', 'reverse that', 'ctrl+z', 'ctrl z'];
+    const redoPatterns = ['redo', 'redo that', 'go forward', 'ctrl+y', 'ctrl y'];
+    if (undoPatterns.includes(lower)) {
+      return res.json({ action: 'undo', message: "Done! I've undone the last change." });
+    }
+    if (redoPatterns.includes(lower)) {
+      return res.json({ action: 'redo', message: "Done! I've redone the last change." });
+    }
+
+    const currentStateStr = typeof currentState === 'string' ? currentState : JSON.stringify(currentState);
+    const result = await processAiChat(prompt, currentStateStr, selectedNodeId, selectedNodeName);
+    res.json(result);
+  } catch (err) {
+    console.error("AI Chat Error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// SSE streaming endpoint
+app.post('/api/ai/chat/stream', async (req, res) => {
+  try {
+    const { prompt, currentState, selectedNodeId, selectedNodeName } = req.body;
+    if (!prompt || !currentState) {
+      res.status(400).json({ error: "Missing prompt or currentState" });
+      return;
+    }
+
+    // Detect undo/redo intent — respond immediately, no AI call needed
+    const lower = prompt.toLowerCase().trim();
+    const undoPatterns = ['undo', 'undo that', 'go back', 'revert', 'reverse that', 'ctrl+z', 'ctrl z'];
+    const redoPatterns = ['redo', 'redo that', 'go forward', 'ctrl+y', 'ctrl y'];
+    if (undoPatterns.includes(lower)) {
+      res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Access-Control-Allow-Origin': '*' });
+      res.write(`data: ${JSON.stringify({ type: 'done', action: 'undo', message: "Done! I've undone the last change." })}\n\n`);
+      res.end();
+      return;
+    }
+    if (redoPatterns.includes(lower)) {
+      res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'Access-Control-Allow-Origin': '*' });
+      res.write(`data: ${JSON.stringify({ type: 'done', action: 'redo', message: "Done! I've redone the last change." })}\n\n`);
+      res.end();
+      return;
+    }
+
+    const currentStateStr = typeof currentState === 'string' ? currentState : JSON.stringify(currentState);
+    await processAiChatStream(prompt, currentStateStr, selectedNodeId, selectedNodeName, res);
+  } catch (err) {
+    console.error("AI Chat Stream Error:", err);
+    if (!res.headersSent) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+});
+
 app.listen(3001, () => console.log('Compiler API running on port 3001'));
+

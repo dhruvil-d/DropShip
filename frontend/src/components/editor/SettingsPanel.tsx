@@ -57,7 +57,7 @@ function DarkModeOverrideWidget({ nodeId }: { nodeId: string }) {
           <div className="text-xs font-medium text-gray-700 leading-tight mt-0.5">{resolvedLabel}</div>
         </div>
       </div>
-      <div className="flex bg-white rounded-md border border-gray-200 overflow-hidden">
+      <div className="flex bg-white rounded-md border border-gray-200 overflow-hidden shrink-0">
         {overrideOptions.map((opt) => (
           <button
             key={opt.value}
