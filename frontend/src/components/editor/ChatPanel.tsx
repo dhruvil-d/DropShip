@@ -31,7 +31,7 @@ export const ChatPanel = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [streamingText, setStreamingText] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesAreaRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { actions, query, selected } = useEditor((state) => {
@@ -40,7 +40,12 @@ export const ChatPanel = () => {
     if (nodeId) {
       sel = {
         id: nodeId,
-        name: state.nodes[nodeId]?.data?.name || 'Unknown',
+        name: nodeId === 'ROOT' ? 'Global' : (state.nodes[nodeId]?.data?.name || 'Unknown'),
+      };
+    } else {
+      sel = {
+        id: 'ROOT',
+        name: 'Global'
       };
     }
     return { selected: sel };
@@ -50,7 +55,12 @@ export const ChatPanel = () => {
   const mode = 'light';
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesAreaRef.current) {
+      messagesAreaRef.current.scrollTo({
+        top: messagesAreaRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -182,22 +192,9 @@ export const ChatPanel = () => {
   return (
     <div className={`ai-chat-panel ${mode} h-full flex flex-col w-full`}>
 
-      {/* ===== Header ===== */}
-      <div className="ai-chat-header">
-        <div className="ai-chat-header-icon">
-          <Sparkles size={18} />
-        </div>
-        <div className="ai-chat-header-info">
-          <h3>DropShip AI</h3>
-          <p className="text-gray-400">
-            Describe changes · Build layouts · Style live
-          </p>
-        </div>
-      </div>
-
       {/* ===== Context Chip (Selected Component) ===== */}
       {selected && (
-        <div className="px-4 pt-2.5 relative z-[1]">
+        <div className="px-4 pt-4 relative z-[1]">
           <div className="ai-context-chip">
             <span className="chip-dot" />
             <Crosshair size={10} className="opacity-70" />
@@ -207,7 +204,7 @@ export const ChatPanel = () => {
       )}
 
       {/* ===== Messages ===== */}
-      <div className="ai-messages-area">
+      <div className="ai-messages-area" ref={messagesAreaRef}>
         {messages.map((msg) => (
           <div key={msg.id} className={`ai-msg ${msg.role === 'user' ? 'user' : 'assistant'}`}>
             <div className={`ai-msg-avatar ${
@@ -257,8 +254,6 @@ export const ChatPanel = () => {
             </div>
           </div>
         )}
-
-        <div ref={messagesEndRef} />
       </div>
 
       {/* ===== Quick Suggestions ===== */}
