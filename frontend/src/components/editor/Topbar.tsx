@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useEditor } from '@craftjs/core';
 import { Play, Undo, Redo, Loader2, Save, Download, Moon, Sun, Rocket } from 'lucide-react';
+import { Github } from '../icons/GithubIcon';
 import { PreviewModal } from './PreviewModal';
+import { GitHubExportModal } from './GitHubExportModal';
 import { useDarkModeStore } from '../../shared/darkModeStore';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -16,6 +18,7 @@ export const Topbar = () => {
   const [compiledCode, setCompiledCode] = useState('');
   const [isCompiling, setIsCompiling] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saved'>('idle');
+  const [isGitHubOpen, setIsGitHubOpen] = useState(false);
   const globalDarkMode = useDarkModeStore((s) => s.globalDarkMode);
   const toggleGlobalDarkMode = useDarkModeStore((s) => s.toggleGlobalDarkMode);
 
@@ -147,6 +150,16 @@ export const Topbar = () => {
 
           <div className="w-px h-5 bg-gray-200 mx-1.5" />
 
+          {/* Push to GitHub */}
+          <button
+            onClick={() => setIsGitHubOpen(true)}
+            className="flex items-center gap-2 px-3.5 py-2 text-sm font-semibold text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 hover:border-gray-300 transition-all duration-200 active:scale-[0.97]"
+            title="Push to GitHub"
+          >
+            <Github size={15} />
+            Push to GitHub
+          </button>
+
           {/* Preview */}
           <button 
             onClick={handleCompileAndPreview}
@@ -163,6 +176,10 @@ export const Topbar = () => {
         isOpen={isPreviewOpen} 
         onClose={() => setIsPreviewOpen(false)} 
         code={compiledCode} 
+      />
+      <GitHubExportModal
+        isOpen={isGitHubOpen}
+        onClose={() => setIsGitHubOpen(false)}
       />
     </>
   );

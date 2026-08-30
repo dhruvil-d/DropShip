@@ -4,7 +4,7 @@
 // ============================================================
 
 import { useCallback, useEffect } from 'react';
-import { useNode } from '@craftjs/core';
+import { useNode, useEditor } from '@craftjs/core';
 import { useResponsiveStore } from '../shared/responsiveStore';
 import { useDarkModeStore } from '../shared/darkModeStore';
 import type { DimensionsMeta } from '../shared/responsiveStore';
@@ -43,6 +43,17 @@ export function useResponsiveNode(): ResponsiveNodeResult {
     nodeProps: node.data.props as Record<string, any>,
   }));
 
+  const { ancestors } = useEditor((_state, query) => {
+    try {
+      if (query && id && query.node(id)) {
+        return { ancestors: query.node(id).ancestors() };
+      }
+    } catch {
+      // fallback
+    }
+    return { ancestors: [] };
+  });
+
   const activeMeta = useResponsiveStore((s) => {
     const meta = s.componentMeta[id];
     if (!meta) return null;
@@ -51,8 +62,8 @@ export function useResponsiveNode(): ResponsiveNodeResult {
 
   const ensureComponentMeta = useResponsiveStore((s) => s.ensureComponentMeta);
 
-  // Dark mode resolution
-  const isDark = useDarkModeStore((s) => s.getResolvedMode(id) === 'dark');
+  // Dark mode resolution with parent/ancestor inheritance
+  const isDark = useDarkModeStore((s) => s.getResolvedMode(id, ancestors) === 'dark');
 
   // Ensure this component has metadata entries in the store
   useEffect(() => {

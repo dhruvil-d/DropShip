@@ -21,8 +21,8 @@ interface DarkModeState {
   setComponentOverride: (nodeId: string, override: DarkModeOverride) => void;
   removeComponentOverride: (nodeId: string) => void;
 
-  /** Resolve the effective mode for a given component */
-  getResolvedMode: (nodeId: string) => 'light' | 'dark';
+  /** Resolve the effective mode for a given component, optionally checking ancestors */
+  getResolvedMode: (nodeId: string, ancestors?: string[]) => 'light' | 'dark';
 }
 
 // ------ Store ------
@@ -51,14 +51,23 @@ export const useDarkModeStore = create<DarkModeState>((set, get) => ({
       return { componentOverrides: next };
     }),
 
-  getResolvedMode: (nodeId) => {
+  getResolvedMode: (nodeId, ancestors = []) => {
     const state = get();
-    const override = state.componentOverrides[nodeId];
+    const selfOverride = state.componentOverrides[nodeId];
 
-    if (override === 'light') return 'light';
-    if (override === 'dark') return 'dark';
+    if (selfOverride === 'light') return 'light';
+    if (selfOverride === 'dark') return 'dark';
 
-    // 'inherit' or no override → follow global
+    // Walk up ancestor chain (closest parent first)
+    if (ancestors && ancestors.length > 0) {
+      for (const ancestorId of ancestors) {
+        const ancestorOverride = state.componentOverrides[ancestorId];
+        if (ancestorOverride === 'light') return 'light';
+        if (ancestorOverride === 'dark') return 'dark';
+      }
+    }
+
+    // 'inherit' or no override on self and ancestors → follow global
     return state.globalDarkMode ? 'dark' : 'light';
   },
 }));

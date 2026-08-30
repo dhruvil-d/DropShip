@@ -4,10 +4,18 @@ import { AlertCircle, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
 import { Text } from './Text';
+import { deriveDarkColor } from '../../shared/colorTransform';
+import { ColorPickerControl } from '../editor/ColorPickerControl';
 
 interface AlertComponentProps {
-  variant: 'info' | 'success' | 'warning' | 'error';
+  variant: 'info' | 'success' | 'warning' | 'error' | 'custom';
   dismissible: boolean;
+  backgroundColor: string;
+  backgroundColorDark?: string;
+  textColor: string;
+  textColorDark?: string;
+  borderColor: string;
+  borderColorDark?: string;
 }
 
 const variantConfig: Record<string, { bg: string; border: string; text: string; icon: typeof AlertCircle }> = {
@@ -24,13 +32,31 @@ const darkVariantConfig: Record<string, { bg: string; border: string; text: stri
   error:   { bg: 'bg-red-950/40',     border: 'border-red-800/60',    text: 'text-red-300',    icon: XCircle },
 };
 
-export const AlertComponent = ({ variant }: AlertComponentProps) => {
+export const AlertComponent = ({ variant, backgroundColor, backgroundColorDark, textColor, textColorDark, borderColor, borderColorDark }: AlertComponentProps) => {
   const { connectRef, isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLDivElement>(null);
-  const config = isDark
-    ? (darkVariantConfig[variant] || darkVariantConfig.info)
-    : (variantConfig[variant] || variantConfig.info);
-  const Icon = config.icon;
+
+  const isCustom = variant === 'custom';
+
+  // For preset variants, use Tailwind classes
+  const config = !isCustom
+    ? (isDark
+      ? (darkVariantConfig[variant] || darkVariantConfig.info)
+      : (variantConfig[variant] || variantConfig.info))
+    : null;
+
+  // For custom variant, use inline styles
+  const activeBg = isCustom
+    ? (isDark ? (backgroundColorDark || deriveDarkColor(backgroundColor, 'background')) : backgroundColor)
+    : undefined;
+  const activeText = isCustom
+    ? (isDark ? (textColorDark || deriveDarkColor(textColor, 'text')) : textColor)
+    : undefined;
+  const activeBorder = isCustom
+    ? (isDark ? (borderColorDark || deriveDarkColor(borderColor, 'border')) : borderColor)
+    : undefined;
+
+  const Icon = config?.icon || AlertCircle;
 
   return (
     <div
@@ -38,8 +64,17 @@ export const AlertComponent = ({ variant }: AlertComponentProps) => {
         elementRef.current = ref;
         connectRef(ref);
       }}
-      className={`flex items-start gap-3 p-4 rounded-lg border ${config.bg} ${config.border} ${config.text} outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move`}
-      style={{ position: 'relative', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', ...responsiveStyles }}
+      className={`flex items-start gap-3 p-4 rounded-lg border ${isCustom ? '' : `${config!.bg} ${config!.border} ${config!.text}`} outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move`}
+      style={{
+        position: 'relative',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        ...(isCustom ? {
+          backgroundColor: activeBg,
+          color: activeText,
+          borderColor: activeBorder,
+        } : {}),
+        ...responsiveStyles,
+      }}
     >
       <Icon size={20} className="mt-0.5 flex-shrink-0" />
       <div>
@@ -72,9 +107,44 @@ const AlertSettings = () => {
             <option value="success">Success</option>
             <option value="warning">Warning</option>
             <option value="error">Error</option>
+            <option value="custom">Custom Color</option>
           </select>
         </label>
       </div>
+
+      {/* Custom Colors — only show when variant is 'custom' */}
+      {props.variant === 'custom' && (
+        <div>
+          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Colors</h4>
+          <ColorPickerControl
+            label="Background"
+            role="background"
+            lightColor={props.backgroundColor}
+            darkColorOverride={props.backgroundColorDark}
+            onLightChange={(color) => setProp((p: AlertComponentProps) => { p.backgroundColor = color; })}
+            onDarkChange={(color) => setProp((p: AlertComponentProps) => { p.backgroundColorDark = color; })}
+            onDarkReset={() => setProp((p: AlertComponentProps) => { p.backgroundColorDark = undefined; })}
+          />
+          <ColorPickerControl
+            label="Text Color"
+            role="text"
+            lightColor={props.textColor}
+            darkColorOverride={props.textColorDark}
+            onLightChange={(color) => setProp((p: AlertComponentProps) => { p.textColor = color; })}
+            onDarkChange={(color) => setProp((p: AlertComponentProps) => { p.textColorDark = color; })}
+            onDarkReset={() => setProp((p: AlertComponentProps) => { p.textColorDark = undefined; })}
+          />
+          <ColorPickerControl
+            label="Border Color"
+            role="border"
+            lightColor={props.borderColor}
+            darkColorOverride={props.borderColorDark}
+            onLightChange={(color) => setProp((p: AlertComponentProps) => { p.borderColor = color; })}
+            onDarkChange={(color) => setProp((p: AlertComponentProps) => { p.borderColorDark = color; })}
+            onDarkReset={() => setProp((p: AlertComponentProps) => { p.borderColorDark = undefined; })}
+          />
+        </div>
+      )}
     </div>
   );
 };
@@ -84,6 +154,9 @@ AlertComponent.craft = {
   props: {
     variant: 'info',
     dismissible: false,
+    backgroundColor: '#eff6ff',
+    textColor: '#1e40af',
+    borderColor: '#bfdbfe',
   } as AlertComponentProps,
   related: {
     settings: AlertSettings,

@@ -35,19 +35,32 @@ function DarkModeOverrideWidget({ nodeId }: { nodeId: string }) {
   const setOverride = useDarkModeStore((s) => s.setComponentOverride);
   const globalDarkMode = useDarkModeStore((s) => s.globalDarkMode);
 
+  const { ancestors } = useEditor((_state, query) => {
+    try {
+      if (query && nodeId && query.node(nodeId)) {
+        return { ancestors: query.node(nodeId).ancestors() };
+      }
+    } catch {
+      // fallback
+    }
+    return { ancestors: [] };
+  });
+
+  const effectiveMode = useDarkModeStore((s) => s.getResolvedMode(nodeId, ancestors));
+
   const resolvedLabel = override === 'inherit'
-    ? (globalDarkMode ? 'Dark (global)' : 'Light (global)')
+    ? `${effectiveMode === 'dark' ? 'Dark' : 'Light'} (inherited)`
     : override === 'dark' ? 'Dark' : 'Light';
 
   return (
     <div className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-100">
       <div className="flex items-center gap-2">
         <div className={`w-5 h-5 rounded flex items-center justify-center ${
-          (override === 'dark' || (override === 'inherit' && globalDarkMode))
+          effectiveMode === 'dark'
             ? 'bg-indigo-100 text-indigo-600'
             : 'bg-amber-100 text-amber-600'
         }`}>
-          {(override === 'dark' || (override === 'inherit' && globalDarkMode))
+          {effectiveMode === 'dark'
             ? <Moon size={12} />
             : <Sun size={12} />
           }

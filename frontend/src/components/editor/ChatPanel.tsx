@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useEditor } from '@craftjs/core';
-import { Bot, Send, Sparkles, AlertCircle, Crosshair } from 'lucide-react';
+import { Bot, Send, AlertCircle, Crosshair } from 'lucide-react';
 import '../../styles/ai-chat.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';

@@ -69,19 +69,24 @@ const registry = {
 
   Button: {
     tagName: 'button',
-    baseClasses: 'rounded font-medium cursor-pointer border-0',
+    baseClasses: 'font-medium cursor-pointer border-0',
     selfClosing: false,
     propBehaviors: {
-      variant:   { type: 'skip' },
-      size:      { type: 'skip' },
-      disabled:  { type: 'attribute' },
-      fullWidth: { type: 'skip' },
+      variant:            { type: 'skip' },
+      size:               { type: 'skip' },
+      disabled:           { type: 'attribute' },
+      fullWidth:          { type: 'skip' },
+      backgroundColor:    { type: 'style', cssProp: 'backgroundColor' },
+      textColor:          { type: 'style', cssProp: 'color' },
+      borderColor:        { type: 'style', cssProp: 'borderColor' },
+      borderRadius:       { type: 'style', cssProp: 'borderRadius', suffix: 'px' },
     },
     variantClasses: {
       variant: {
         primary:   'bg-blue-600 text-white hover:bg-blue-700',
         secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
         outline:   'border border-blue-600 text-blue-600 bg-transparent hover:bg-blue-50',
+        custom:    '',
       },
       size: {
         sm: 'px-3 py-1.5 text-sm',
@@ -234,7 +239,9 @@ const registry = {
     baseClasses: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
     selfClosing: false,
     propBehaviors: {
-      variant: { type: 'skip' },
+      variant:         { type: 'skip' },
+      backgroundColor: { type: 'style', cssProp: 'backgroundColor' },
+      textColor:       { type: 'style', cssProp: 'color' },
     },
     variantClasses: {
       variant: {
@@ -243,6 +250,7 @@ const registry = {
         warning: 'bg-yellow-100 text-yellow-800',
         error:   'bg-red-100 text-red-800',
         gray:    'bg-gray-100 text-gray-800',
+        custom:  '',
       },
     },
   },
@@ -263,8 +271,11 @@ const registry = {
     baseClasses: 'flex items-start gap-3 p-4 rounded-lg border',
     selfClosing: false,
     propBehaviors: {
-      variant:     { type: 'skip' },
-      dismissible: { type: 'skip' },
+      variant:         { type: 'skip' },
+      dismissible:     { type: 'skip' },
+      backgroundColor: { type: 'style', cssProp: 'backgroundColor' },
+      textColor:       { type: 'style', cssProp: 'color' },
+      borderColor:     { type: 'style', cssProp: 'borderColor' },
     },
     isAlert: true,
     variantClasses: {
@@ -273,20 +284,23 @@ const registry = {
         success: 'bg-green-50 border-green-200 text-green-800',
         warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
         error:   'bg-red-50 border-red-200 text-red-800',
+        custom:  '',
       },
     },
   },
 
   AvatarComponent: {
     tagName: 'div',
-    baseClasses: 'inline-flex items-center justify-center bg-gray-200 text-gray-600 font-medium overflow-hidden',
+    baseClasses: 'inline-flex items-center justify-center font-medium overflow-hidden',
     selfClosing: false,
     propBehaviors: {
-      src:          { type: 'skip' },
-      alt:          { type: 'skip' },
-      fallbackText: { type: 'skip' },
-      size:         { type: 'skip' },
-      shape:        { type: 'skip' },
+      src:             { type: 'skip' },
+      alt:             { type: 'skip' },
+      fallbackText:    { type: 'skip' },
+      size:            { type: 'skip' },
+      shape:           { type: 'skip' },
+      backgroundColor: { type: 'style', cssProp: 'backgroundColor' },
+      textColor:       { type: 'style', cssProp: 'color' },
     },
     isAvatar: true,
     variantClasses: {

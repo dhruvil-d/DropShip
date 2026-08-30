@@ -2,6 +2,8 @@ import { useRef } from 'react';
 import { useNode } from '@craftjs/core';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
+import { deriveDarkColor } from '../../shared/colorTransform';
+import { ColorPickerControl } from '../editor/ColorPickerControl';
 
 interface AvatarComponentProps {
   src: string;
@@ -9,6 +11,10 @@ interface AvatarComponentProps {
   fallbackText: string;
   size: 'sm' | 'md' | 'lg' | 'xl';
   shape: 'circle' | 'rounded';
+  backgroundColor: string;
+  backgroundColorDark?: string;
+  textColor: string;
+  textColorDark?: string;
 }
 
 const sizeClasses: Record<string, string> = {
@@ -23,9 +29,16 @@ const shapeClasses: Record<string, string> = {
   rounded: 'rounded-lg',
 };
 
-export const AvatarComponent = ({ src, alt, fallbackText, size, shape }: AvatarComponentProps) => {
+export const AvatarComponent = ({ src, alt, fallbackText, size, shape, backgroundColor, backgroundColorDark, textColor, textColorDark }: AvatarComponentProps) => {
   const { connectRef, isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLDivElement>(null);
+
+  const activeBg = isDark
+    ? (backgroundColorDark || deriveDarkColor(backgroundColor, 'background'))
+    : backgroundColor;
+  const activeText = isDark
+    ? (textColorDark || deriveDarkColor(textColor, 'text'))
+    : textColor;
 
   return (
     <div
@@ -33,8 +46,14 @@ export const AvatarComponent = ({ src, alt, fallbackText, size, shape }: AvatarC
         elementRef.current = ref;
         connectRef(ref);
       }}
-      className={`inline-flex items-center justify-center ${isDark ? 'bg-slate-700 text-slate-300' : 'bg-gray-200 text-gray-600'} font-medium overflow-hidden outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move ${sizeClasses[size] || ''} ${shapeClasses[shape] || ''}`}
-      style={{ position: 'relative', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', ...responsiveStyles }}
+      className={`inline-flex items-center justify-center font-medium overflow-hidden outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move ${sizeClasses[size] || ''} ${shapeClasses[shape] || ''}`}
+      style={{
+        position: 'relative',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        backgroundColor: src ? undefined : activeBg,
+        color: src ? undefined : activeText,
+        ...responsiveStyles,
+      }}
     >
       {src ? (
         <img src={src} alt={alt} className="w-full h-full object-cover" />
@@ -95,6 +114,28 @@ const AvatarSettings = () => {
           </select>
         </label>
       </div>
+
+      <div>
+        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Fallback Colors</h4>
+        <ColorPickerControl
+          label="Background"
+          role="background"
+          lightColor={props.backgroundColor}
+          darkColorOverride={props.backgroundColorDark}
+          onLightChange={(color) => setProp((p: AvatarComponentProps) => { p.backgroundColor = color; })}
+          onDarkChange={(color) => setProp((p: AvatarComponentProps) => { p.backgroundColorDark = color; })}
+          onDarkReset={() => setProp((p: AvatarComponentProps) => { p.backgroundColorDark = undefined; })}
+        />
+        <ColorPickerControl
+          label="Text Color"
+          role="text"
+          lightColor={props.textColor}
+          darkColorOverride={props.textColorDark}
+          onLightChange={(color) => setProp((p: AvatarComponentProps) => { p.textColor = color; })}
+          onDarkChange={(color) => setProp((p: AvatarComponentProps) => { p.textColorDark = color; })}
+          onDarkReset={() => setProp((p: AvatarComponentProps) => { p.textColorDark = undefined; })}
+        />
+      </div>
     </div>
   );
 };
@@ -107,6 +148,8 @@ AvatarComponent.craft = {
     fallbackText: 'JD',
     size: 'md',
     shape: 'circle',
+    backgroundColor: '#e5e7eb',
+    textColor: '#4b5563',
   } as AvatarComponentProps,
   related: {
     settings: AvatarSettings,

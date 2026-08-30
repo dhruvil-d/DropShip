@@ -3,9 +3,15 @@ import { Element, useNode } from '@craftjs/core';
 import { useResponsiveNode } from '../../hooks/useResponsiveNode';
 import { ResizeHandles } from '../editor/ResizeHandles';
 import { Text } from './Text';
+import { deriveDarkColor } from '../../shared/colorTransform';
+import { ColorPickerControl } from '../editor/ColorPickerControl';
 
 interface BadgeComponentProps {
-  variant: 'default' | 'success' | 'warning' | 'error' | 'gray';
+  variant: 'default' | 'success' | 'warning' | 'error' | 'gray' | 'custom';
+  backgroundColor: string;
+  backgroundColorDark?: string;
+  textColor: string;
+  textColorDark?: string;
 }
 
 const variantClasses: Record<string, string> = {
@@ -24,9 +30,18 @@ const darkVariantClasses: Record<string, string> = {
   gray: 'bg-slate-700/60 text-slate-300',
 };
 
-export const BadgeComponent = ({ variant }: BadgeComponentProps) => {
+export const BadgeComponent = ({ variant, backgroundColor, backgroundColorDark, textColor, textColorDark }: BadgeComponentProps) => {
   const { connectRef, isSelected, isDark, responsiveStyles, nodeId } = useResponsiveNode();
   const elementRef = useRef<HTMLSpanElement>(null);
+
+  const isCustom = variant === 'custom';
+
+  const activeBg = isCustom
+    ? (isDark ? (backgroundColorDark || deriveDarkColor(backgroundColor, 'background')) : backgroundColor)
+    : undefined;
+  const activeText = isCustom
+    ? (isDark ? (textColorDark || deriveDarkColor(textColor, 'text')) : textColor)
+    : undefined;
 
   return (
     <span
@@ -34,8 +49,13 @@ export const BadgeComponent = ({ variant }: BadgeComponentProps) => {
         elementRef.current = ref;
         connectRef(ref);
       }}
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move ${(isDark ? darkVariantClasses[variant] : variantClasses[variant]) || ''}`}
-      style={{ position: 'relative', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)', ...responsiveStyles }}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium outline-transparent hover:outline-blue-400 hover:outline-dashed hover:outline-2 transition-all cursor-move ${isCustom ? '' : ((isDark ? darkVariantClasses[variant] : variantClasses[variant]) || '')}`}
+      style={{
+        position: 'relative',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        ...(isCustom ? { backgroundColor: activeBg, color: activeText } : {}),
+        ...responsiveStyles,
+      }}
     >
       <Element id="badge-text" is={Text} text="Badge" fontSize={12} fontWeight="500" color="inherit" textAlign="center" lineHeight={1.5} />
       {isSelected && <ResizeHandles nodeId={nodeId} targetRef={elementRef} />}
@@ -63,9 +83,35 @@ const BadgeSettings = () => {
             <option value="warning">Warning (Yellow)</option>
             <option value="error">Error (Red)</option>
             <option value="gray">Gray</option>
+            <option value="custom">Custom Color</option>
           </select>
         </label>
       </div>
+
+      {/* Custom Colors — only show when variant is 'custom' */}
+      {props.variant === 'custom' && (
+        <div>
+          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Colors</h4>
+          <ColorPickerControl
+            label="Background"
+            role="background"
+            lightColor={props.backgroundColor}
+            darkColorOverride={props.backgroundColorDark}
+            onLightChange={(color) => setProp((p: BadgeComponentProps) => { p.backgroundColor = color; })}
+            onDarkChange={(color) => setProp((p: BadgeComponentProps) => { p.backgroundColorDark = color; })}
+            onDarkReset={() => setProp((p: BadgeComponentProps) => { p.backgroundColorDark = undefined; })}
+          />
+          <ColorPickerControl
+            label="Text Color"
+            role="text"
+            lightColor={props.textColor}
+            darkColorOverride={props.textColorDark}
+            onLightChange={(color) => setProp((p: BadgeComponentProps) => { p.textColor = color; })}
+            onDarkChange={(color) => setProp((p: BadgeComponentProps) => { p.textColorDark = color; })}
+            onDarkReset={() => setProp((p: BadgeComponentProps) => { p.textColorDark = undefined; })}
+          />
+        </div>
+      )}
     </div>
   );
 };
@@ -74,6 +120,8 @@ BadgeComponent.craft = {
   displayName: 'BadgeComponent',
   props: {
     variant: 'default',
+    backgroundColor: '#dbeafe',
+    textColor: '#1e40af',
   } as BadgeComponentProps,
   related: {
     settings: BadgeSettings,

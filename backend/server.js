@@ -5,10 +5,17 @@ const t = require('@babel/types');
 const generate = require('@babel/generator').default;
 const registry = require('./component-registry');
 const { processAiChat, processAiChatStream } = require('./aiHandler');
+const { pushFileToGitHub } = require('./githubHandler');
 
 const app = express();
-app.use(cors());
+const corsOrigin = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*';
+app.use(cors({ origin: corsOrigin, credentials: true }));
 app.use(express.json({ limit: '50mb' })); // Increased limit for Base64 images
+
+// Health check endpoints for load balancers / cloud monitoring
+app.get(['/', '/health', '/api/health'], (req, res) => {
+  res.json({ status: 'ok', service: 'dropship-api', timestamp: new Date().toISOString() });
+});
 
 // ============================================================
 // Dynamic JSX Compiler — Registry-Driven
@@ -611,5 +618,62 @@ app.post('/api/ai/chat/stream', async (req, res) => {
   }
 });
 
-app.listen(3001, () => console.log('Compiler API running on port 3001'));
+// ============================================================
+// GitHub Export
+// ============================================================
+
+app.post('/api/github/export', async (req, res) => {
+  const { token, owner, repo, path, message, branch, craftState } = req.body;
+
+  if (!token || !owner || !repo || !craftState) {
+    return res.status(400).json({
+      error: 'Missing required fields: token, owner, repo, craftState',
+    });
+  }
+
+  try {
+    // 1. Compile the Craft.js state to React code (reuse existing logic)
+    const rootJSX = generateJSX(craftState, 'ROOT');
+
+    const appFunction = t.functionDeclaration(
+      t.identifier('ExportedApp'),
+      [],
+      t.blockStatement([t.returnStatement(rootJSX)])
+    );
+
+    const file = t.file(
+      t.program([
+        t.importDeclaration(
+          [t.importDefaultSpecifier(t.identifier('React'))],
+          t.stringLiteral('react')
+        ),
+        appFunction,
+        t.exportDefaultDeclaration(t.identifier('ExportedApp')),
+      ])
+    );
+
+    const compiledCode = generate(file, {}, '').code;
+
+    // 2. Push to GitHub
+    const result = await pushFileToGitHub({
+      token,
+      owner,
+      repo,
+      path: path || 'src/ExportedApp.jsx',
+      content: compiledCode,
+      message: message || 'Update UI from DropShip',
+      branch: branch || undefined,
+    });
+
+    res.json(result);
+  } catch (err) {
+    console.error('GitHub Export Error:', err);
+    res.status(err.message.includes('Invalid GitHub token') ? 401 : 500).json({
+      error: err.message,
+    });
+  }
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Compiler API running on port ${PORT}`));
 
